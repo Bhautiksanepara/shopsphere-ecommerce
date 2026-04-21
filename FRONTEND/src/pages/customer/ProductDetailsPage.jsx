@@ -211,7 +211,10 @@ function ProductDetailsPage() {
     ? baseDiscountedPrice
     : baseRegularPrice) + modifierExtraPrice;
   const savingsPct = getSavingsPct(effectiveRegularPrice, effectivePrice);
-  const effectiveStock = selectedPortion
+  const combinationStock = Number(selectedCombination?.stock ?? 0);
+  const effectiveStock = selectedCombination
+    ? combinationStock
+    : selectedPortion
     ? Number(selectedPortion.stock || 0)
     : Number(product?.stock || 0);
   const stockMeta = getStockLabel(effectiveStock);
@@ -323,9 +326,10 @@ function ProductDetailsPage() {
       setProduct(productData);
       setImages(imageData?.length ? imageData : []);
       const activePortions = (portionsData || []).filter((item) => Number(item.is_active) === 1);
-      setPortions(activePortions);
+      const visiblePortions = activePortions.length > 0 ? activePortions : portionsData || [];
+      setPortions(visiblePortions);
       const defaultPortion =
-        activePortions.find((item) => Number(item.is_default) === 1) || activePortions[0] || null;
+        visiblePortions.find((item) => Number(item.is_default) === 1) || visiblePortions[0] || null;
       setSelectedPortionId(defaultPortion?.product_portion_id || null);
       setSummary(reviewSummaryData);
       setOffers(offerData || []);
@@ -418,42 +422,50 @@ function ProductDetailsPage() {
           api.get(rawModUrl)
         ]);
 
-        let finalCombos = comboRes.data?.data || [];
-        let finalMods = modRes.data?.data || [];
+        const primaryCombos = comboRes.data?.data ?? [];
+        const primaryMods = modRes.data?.data ?? [];
+        let finalCombos = Array.isArray(primaryCombos) ? primaryCombos : [];
+        let finalMods = Array.isArray(primaryMods) ? primaryMods : [];
 
-        // Fallback: If portion-specific fetch returned nothing, try product-level
-        if (selectedPortion && finalCombos.length === 0 && finalMods.length === 0) {
+        if (selectedPortion && finalCombos.length === 0) {
           try {
-            const [fbComboRes, fbModRes] = await Promise.all([
-              api.get(`/modifiers/combinations/by-product/${productId}`),
-              api.get(`/modifiers/by-product/${productId}`)
-            ]);
-            finalCombos = fbComboRes.data?.data || [];
-            finalMods = fbModRes.data?.data || [];
+            const fbComboRes = await api.get(`/modifiers/combinations/by-product/${productId}`);
+            const fallbackCombos = fbComboRes.data?.data ?? [];
+            finalCombos = Array.isArray(fallbackCombos) ? fallbackCombos : [];
           } catch (err) {
-            console.error("Fallback fetch failed:", err);
+            console.error("Combination fallback fetch failed:", err);
+          }
+        }
+
+        if (selectedPortion && finalMods.length === 0 && finalCombos.length === 0) {
+          try {
+            const fbModRes = await api.get(`/modifiers/by-product/${productId}`);
+            const fallbackMods = fbModRes.data?.data ?? [];
+            finalMods = Array.isArray(fallbackMods) ? fallbackMods : [];
+          } catch (err) {
+            console.error("Modifier fallback fetch failed:", err);
           }
         }
         
         setCombinations(finalCombos);
         setRawModifiers(finalMods);
 
-        // Auto-select mandatory modifiers by default
+        // Auto-select mandatory modifiers by default when choosing raw modifiers.
         const isOptional = (nm) => {
           const n = nm.toLowerCase();
           return n.includes("warranty") || n.includes("care") || n.includes("protection") || n.includes("installation") || n.includes("gift wrap");
         };
 
         const defaultSelections = {};
-        finalMods.forEach(m => {
-          if (!isOptional(m.modifier_name) && !defaultSelections[m.modifier_name]) {
+        finalMods.forEach((m) => {
+          if (!finalCombos.length && !isOptional(m.modifier_name) && !defaultSelections[m.modifier_name]) {
             defaultSelections[m.modifier_name] = m.modifier_id;
           }
         });
-        setSelectedModifiers(defaultSelections); 
+        setSelectedModifiers(defaultSelections);
 
         // Auto-select the first in-stock combination
-        const firstInStock = finalCombos.find(c => Number(c.stock) > 0);
+        const firstInStock = finalCombos.find((c) => Number(c.stock) > 0);
         if (firstInStock) {
           setSelectedCombinationId(firstInStock.combination_id);
         } else if (finalCombos.length > 0) {
@@ -510,6 +522,7 @@ function ProductDetailsPage() {
   const requiredModifierMissing = useMemo(() => {
     let missing = false;
     if (combinations.length > 0 && !selectedCombinationId) missing = true;
+    if (combinations.length > 0) return missing;
     
     // For raw modifiers, check if all mandatory groups have a selection
     // Optional groups include Warranty, Care, Protection, Installation, and Gift Wrap

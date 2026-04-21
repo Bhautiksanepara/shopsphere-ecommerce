@@ -63,10 +63,10 @@ const isHashMatch = (inputHashHex, expectedHashHex) => {
 };
 
 const getMailTransportConfig = () => {
-  const host = process.env.SMTP_HOST;
+  const host = process.env.SMTP_HOST?.trim();
   const port = Number(process.env.SMTP_PORT || 587);
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
+  const user = process.env.SMTP_USER?.trim();
+  const pass = process.env.SMTP_PASS?.trim();
 
   if (!host || !port || !user || !pass) {
     return null;
@@ -108,15 +108,30 @@ const sendOtpEmail = async ({ to, otp, purpose }) => {
           : "Your password reset OTP";
 
   const mailFrom =
-    process.env.SMTP_FROM ||
+    process.env.SMTP_FROM?.trim() ||
     `"${process.env.SMTP_FROM_NAME || "Ecommerce App"}" <${process.env.SMTP_USER}>`;
 
-  await transporter.sendMail({
-    from: mailFrom,
-    to,
-    subject,
-    text: `Your OTP is ${otp}. It expires in ${OTP_EXPIRES_IN}.`,
-  });
+  try {
+    await transporter.sendMail({
+      from: mailFrom,
+      to,
+      subject,
+      text: `Your OTP is ${otp}. It expires in ${OTP_EXPIRES_IN}.`,
+    });
+  } catch (error) {
+    console.error("[MAIL][OTP] sendMail failed", {
+      message: error?.message,
+      code: error?.code,
+      command: error?.command,
+      response: error?.response,
+      responseCode: error?.responseCode,
+      to,
+      from: mailFrom,
+      host: transportConfig.host,
+      port: transportConfig.port,
+    });
+    throw error;
+  }
 };
 
 const sendAdminCreatedEmail = async ({ to, name, tempPassword }) => {
@@ -307,7 +322,11 @@ export const registerRequestOtp = async (req, res) => {
     return ok(res, "OTP sent to your email", responseData);
   } catch (error) {
     console.error("registerRequestOtp Error:", error);
-    return serverError(res, "Failed to send registration OTP");
+    const debugMessage =
+      process.env.NODE_ENV !== "production"
+        ? error?.message || "Failed to send registration OTP"
+        : "Failed to send registration OTP";
+    return serverError(res, debugMessage);
   }
 };
 //verify otp

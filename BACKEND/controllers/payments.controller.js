@@ -41,6 +41,16 @@ const getStripeClient = () => {
   };
 };
 
+const getReadablePaymentError = (error, fallback = "Failed to initiate payment") => {
+  const stripeMessage =
+    error?.raw?.message ||
+    error?.message ||
+    error?.response?.data?.error?.message ||
+    error?.response?.data?.message;
+
+  return stripeMessage || fallback;
+};
+
 const canAccessOrder = (req, order) =>
   Boolean(order) &&
   (req.user?.role === "admin" || Number(order.user_id) === Number(req.user?.id));
@@ -238,8 +248,23 @@ const PaymentController = {
         currency: currency.toLowerCase(),
       });
     } catch (error) {
-      console.error("Initiate payment error:", error);
-      return serverError(res, "Failed to initiate payment");
+      console.error("Initiate payment error:", {
+        message: error?.message,
+        type: error?.type,
+        code: error?.code,
+        decline_code: error?.decline_code,
+        raw_message: error?.raw?.message,
+        raw_type: error?.raw?.type,
+        raw_code: error?.raw?.code,
+        stack: error?.stack,
+      });
+      return serverError(
+        res,
+        getReadablePaymentError(
+          error,
+          "Failed to initiate payment",
+        ),
+      );
     }
   },
 
@@ -346,8 +371,20 @@ const PaymentController = {
         },
       );
     } catch (error) {
-      console.error("Verify payment error:", error);
-      return serverError(res, "Failed to verify payment");
+      console.error("Verify payment error:", {
+        message: error?.message,
+        type: error?.type,
+        code: error?.code,
+        decline_code: error?.decline_code,
+        raw_message: error?.raw?.message,
+        raw_type: error?.raw?.type,
+        raw_code: error?.raw?.code,
+        stack: error?.stack,
+      });
+      return serverError(
+        res,
+        getReadablePaymentError(error, "Failed to verify payment"),
+      );
     }
   },
 

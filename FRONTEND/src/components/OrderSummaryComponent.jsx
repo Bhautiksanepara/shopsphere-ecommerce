@@ -36,8 +36,14 @@ export default function OrderSummaryComponent({
         orderData.subtotal ?? orderData.total_price ?? orderData.total_amount,
       );
       const tax = toNumber(orderData.tax_amount ?? orderData.tax);
+      const itemDiscount = toNumber(
+        orderData.item_discount ?? orderData.itemDiscount,
+      );
+      const cartDiscount = toNumber(
+        orderData.cart_discount ?? orderData.cartDiscount,
+      );
       const discount = toNumber(
-        orderData.discount_amount ?? orderData.discount,
+        orderData.discount_amount ?? orderData.discount ?? itemDiscount + cartDiscount,
       );
       const shipping = toNumber(
         orderData.shipping_amount ?? orderData.shipping,
@@ -50,6 +56,8 @@ export default function OrderSummaryComponent({
       return {
         total_price: subtotal,
         tax,
+        item_discount: itemDiscount,
+        cart_discount: cartDiscount,
         discount,
         shipping,
         final_amount: finalAmount,
@@ -59,6 +67,8 @@ export default function OrderSummaryComponent({
     return {
       total_price: toNumber(orderSummery?.total_price),
       tax: toNumber(orderSummery?.tax),
+      item_discount: toNumber(orderSummery?.item_discount),
+      cart_discount: toNumber(orderSummery?.cart_discount),
       discount: toNumber(orderSummery?.discount),
       shipping: toNumber(orderSummery?.shipping),
       final_amount: toNumber(orderSummery?.final_amount),
@@ -90,8 +100,26 @@ export default function OrderSummaryComponent({
         </span>
       </div>
 
+      {summary.item_discount > 0 && (
+        <div className="mb-3 flex items-center justify-between text-sm">
+          <span className="text-gray-500 dark:text-slate-400">Item Discount</span>
+          <span className="font-medium text-emerald-600 dark:text-emerald-400">
+            - {formatINR(summary.item_discount)}
+          </span>
+        </div>
+      )}
+
+      {summary.cart_discount > 0 && (
+        <div className="mb-3 flex items-center justify-between text-sm">
+          <span className="text-gray-500 dark:text-slate-400">Cart Discount</span>
+          <span className="font-medium text-emerald-600 dark:text-emerald-400">
+            - {formatINR(summary.cart_discount)}
+          </span>
+        </div>
+      )}
+
       <div className="mb-3 flex items-center justify-between text-sm">
-        <span className="text-gray-500 dark:text-slate-400">Discount</span>
+        <span className="text-gray-500 dark:text-slate-400">Total Discount</span>
         <span className="font-medium text-emerald-600 dark:text-emerald-400">
           - {formatINR(summary.discount || 0)}
         </span>

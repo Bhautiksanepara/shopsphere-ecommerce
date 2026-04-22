@@ -30,6 +30,10 @@ import {
   getLatestCancelRequestForOrder,
 } from "../models/Order_master.model.js";
 import { insertQuery } from "../models/Order_items.model.js";
+import {
+  getCartItemsWithOffer,
+  getCartWithOffer,
+} from "../models/offer.model.js";
 
 import {
   badRequest,
@@ -45,6 +49,28 @@ const DEFAULT_ORDER_LIMIT = 5;
 const MAX_ORDER_LIMIT = 50;
 const DEFAULT_ORDER_SORT_FIELD = "created_at";
 const DEFAULT_ORDER_SORT_ORDER = "DESC";
+
+const roundCurrency = (value) => Math.round((Number(value) || 0) * 100) / 100;
+
+const calculateDiscountAmount = (offer, subtotal) => {
+  if (!offer || !subtotal) return 0;
+
+  const discountType = String(offer.discount_type || "").toLowerCase();
+  const discountValue = Number(offer.discount_value) || 0;
+  const maximumDiscountAmount =
+    Number(offer.maximum_discount_amount) || Number.POSITIVE_INFINITY;
+
+  let discountAmount = 0;
+
+  if (discountType === "percentage") {
+    discountAmount = (subtotal * discountValue) / 100;
+    discountAmount = Math.min(discountAmount, maximumDiscountAmount);
+  } else if (discountType === "fixed_amount") {
+    discountAmount = Math.min(discountValue, subtotal);
+  }
+
+  return roundCurrency(discountAmount);
+};
 
 // Create a new order from user's cart with tax, discounts, and shipping calculations
 export const Order_master = async (req, res) => {
@@ -87,7 +113,7 @@ export const Order_master = async (req, res) => {
       orderId,
       summary.price,
       summary.taxAmountArray,
-      [],
+      summary.itemDiscountArray,
       summary.cart,
     );
 
@@ -97,7 +123,14 @@ export const Order_master = async (req, res) => {
       ...insert,
       order_id: orderId,
       order_number: createdOrder?.order_number || `ORD-${orderId}`,
+      created_at: createdOrder?.created_at || null,
       total_amount: totalAmount,
+      subtotal: summary.totalPrice,
+      tax_amount: summary.totalTax,
+      discount_amount: summary.totalDisCount,
+      item_discount: summary.itemDiscountTotal,
+      cart_discount: summary.cartDiscount,
+      shipping_amount: summary.shipping_amount,
       payment_status: paymentMethod === "stripe" ? "processing" : "pending",
       payment_method: paymentMethod,
     });
@@ -114,6 +147,8 @@ export const getOrderSummery = async (req, res) => {
     return ok(res, "Order summary", {
       total_price: summary.totalPrice,
       tax: summary.totalTax,
+      item_discount: summary.itemDiscountTotal,
+      cart_discount: summary.cartDiscount,
       discount: summary.totalDisCount,
       shipping: summary.shipping_amount,
       final_amount: summary.finalAmount + summary.shipping_amount,
@@ -139,24 +174,47 @@ const calculateOrderValues = async (user_id) => {
     throw new Error("Cart is empty");
   }
 
-  const productsIds = cart.map((item) => item.product_id);
-  const products = await getProducts(productsIds);
+  const normalizedCart = [...cart].sort(
+    (left, right) => Number(left.cart_item_id) - Number(right.cart_item_id),
+  );
+  const cartId = normalizedCart[0]?.cart_id;
+  const cartWithOffer = cartId ? await getCartWithOffer(cartId) : [];
+  const cartItemsWithOffer = cartId ? await getCartItemsWithOffer(cartId) : [];
+  const cartItemsWithOfferMap = Object.fromEntries(
+    cartItemsWithOffer.map((item) => [item.cart_item_id, item]),
+  );
 
-  const portionIds = cart.map((item) => item.product_portion_id);
+  const productsIds = [...new Set(normalizedCart.map((item) => item.product_id))];
+  const products = await getProducts(productsIds);
+  const productMap = Object.fromEntries(
+    products.map((product) => [product.product_id, product]),
+  );
+
+  const portionIds = normalizedCart.map((item) => item.product_portion_id);
 
   let price = [];
+  let lineSubtotalArray = [];
 
   for (let i = 0; i < portionIds.length; i++) {
-    if (portionIds[i] == 0 || portionIds[i] == null) {
-      price.push(Number(products[i].price));
-      continue;
+    const cartItem = normalizedCart[i];
+    const offerItem = cartItemsWithOfferMap[cartItem.cart_item_id];
+    let unitPrice = Number(offerItem?.effective_price);
+
+    if (!unitPrice && (portionIds[i] === 0 || portionIds[i] == null)) {
+      unitPrice = Number(productMap[cartItem.product_id]?.price || 0);
+    } else if (!unitPrice) {
+      const portionPrice = await getPortionPrice(cartItem.product_id, portionIds[i]);
+      unitPrice = Number(portionPrice[0]?.price || 0);
     }
 
-    const portionPrice = await getPortionPrice(productsIds[i], portionIds[i]);
-    price.push(Number(portionPrice[0].price));
+    const quantity = Number(cartItem.quantity) || 0;
+    price.push(roundCurrency(unitPrice));
+    lineSubtotalArray.push(roundCurrency(unitPrice * quantity));
   }
 
-  const totalPrice = price.reduce((sum, val) => sum + val, 0);
+  const totalPrice = roundCurrency(
+    lineSubtotalArray.reduce((sum, val) => sum + val, 0),
+  );
 
   /* TAX CALCULATION */
 
@@ -169,46 +227,68 @@ const calculateOrderValues = async (user_id) => {
 
   const rootCategoryMap = Object.fromEntries(rootCategoryEntries);
 
-  const taxAmountArray = cart.map((item, index) => {
+  const taxAmountArray = normalizedCart.map((item, index) => {
     const categoryId = rootCategoryMap[item.product_id];
     const taxPercent = getTaxPercent(categoryId);
 
-    return (price[index] * taxPercent) / 100;
+    return roundCurrency((lineSubtotalArray[index] * taxPercent) / 100);
   });
 
-  const totalTax = taxAmountArray.reduce((sum, value) => sum + value, 0);
+  const totalTax = roundCurrency(
+    taxAmountArray.reduce((sum, value) => sum + value, 0),
+  );
 
   /* DISCOUNT */
 
-  let totalDisCount = 0;
-  let offer_id = null;
+  const itemDiscountArray = normalizedCart.map((item, index) => {
+    const offerItem = cartItemsWithOfferMap[item.cart_item_id];
+    if (!offerItem?.item_offer_id) return 0;
 
-  const offerOnCart = await getOfferOnCart(user_id);
-  offer_id = offerOnCart[0]?.offer_id || null;
+    return calculateDiscountAmount(
+      {
+        discount_type: offerItem.item_discount_type,
+        discount_value: offerItem.item_discount_value,
+        maximum_discount_amount: offerItem.item_max_discount,
+      },
+      lineSubtotalArray[index],
+    );
+  });
 
-  const findOffer = await getOfferDetails(offer_id);
+  const itemDiscountTotal = roundCurrency(
+    itemDiscountArray.reduce((sum, value) => sum + value, 0),
+  );
 
-  if (findOffer.length > 0) {
-    if (findOffer[0].discount_type === "percentage") {
-      totalDisCount = (totalPrice * Number(findOffer[0].discount_value)) / 100;
-    }
+  const cartOfferRow = cartWithOffer[0];
+  const cartDiscount =
+    cartOfferRow?.offer_id &&
+    (!cartOfferRow.min_purchase_amount ||
+      totalPrice >= Number(cartOfferRow.min_purchase_amount))
+      ? calculateDiscountAmount(
+          {
+            discount_type: cartOfferRow.discount_type,
+            discount_value: cartOfferRow.discount_value,
+            maximum_discount_amount: cartOfferRow.maximum_discount_amount,
+          },
+          totalPrice,
+        )
+      : 0;
 
-    if (findOffer[0].discount_type === "fixed_amount") {
-      totalDisCount = Number(findOffer[0].discount_value);
-    }
-  }
-
-  const finalAmount = totalPrice + totalTax - totalDisCount;
+  const totalDisCount = roundCurrency(itemDiscountTotal + cartDiscount);
+  const finalAmount = roundCurrency(totalPrice + totalTax - totalDisCount);
 
   let shipping_amount = 50;
   if (finalAmount > 500) shipping_amount = 0;
 
   return {
-    cart,
+    cart: normalizedCart,
     price,
+    lineSubtotalArray,
     taxAmountArray,
+    itemDiscountArray,
     totalPrice,
     totalTax,
+    itemDiscountTotal,
+    cartDiscount,
     totalDisCount,
     finalAmount,
     shipping_amount,
@@ -271,14 +351,12 @@ export const postOrderItems = async (
   orderId,
   price,
   taxAmountArray,
-  totalDisCountArray,
+  itemDiscountArray,
   cart,
 ) => {
   const cart_id = cart[0]?.cart_id;
   // Extract product IDs from cart
   const productIds = cart.map((item) => item.product_id);
-  let offer_id = null;
-  offer_id = totalDisCountArray[0]?.offer_id || null;
 
   // Fetch primary category for each product
   const productCategories = await getCompareProductCategory(productIds);
@@ -314,22 +392,19 @@ export const postOrderItems = async (
     products.map((p) => [p.product_id, p.name]),
   );
 
-  if (!totalDisCountArray || totalDisCountArray.length === 0) {
-    totalDisCountArray = new Array(cart.length).fill(0);
+  if (!itemDiscountArray || itemDiscountArray.length === 0) {
+    itemDiscountArray = new Array(cart.length).fill(0);
   }
 
   const modifiersMapping = [];
 
   // Build order item records with calculated totals
   for (let i = 0; i < cart.length; i++) {
-    // Apply shipping charges based on item price
-    let shippingAmount = 100;
-    if (price[i] > 100) shippingAmount = 0;
-    // Calculate final total for this order item
+    const quantity = Number(cart[i].quantity) || 0;
     const p = isNaN(price[i]) ? 0 : Number(price[i]);
     const t = isNaN(taxAmountArray[i]) ? 0 : Number(taxAmountArray[i]);
-    const d = Number(totalDisCountArray[i]?.offer_id) || 0;
-    const finalTotal = p + t - d;
+    const d = Number(itemDiscountArray[i]) || 0;
+    const finalTotal = roundCurrency(p * quantity + t - d);
 
     const itemModifiers = cart[i].modifier_ids || [];
     const itemModifierObjects = itemModifiers.map(id => modifierMap[id]).filter(Boolean);
@@ -347,7 +422,7 @@ export const postOrderItems = async (
       productMap[productIds[i]] || null,
       portionMap[portionIds[i]] || null,
       primaryModifierValue,
-      quantities[i],
+      quantity,
       p,
       d,
       t,

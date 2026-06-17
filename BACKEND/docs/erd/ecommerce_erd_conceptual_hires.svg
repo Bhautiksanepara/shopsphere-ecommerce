@@ -1,0 +1,475 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3960" height="1460" viewBox="0 0 3960 1460" font-family="Segoe UI, Arial, sans-serif">
+<defs><style><![CDATA[.title { font-size: 30px; font-weight: 700; fill: #102a43; }.subtitle { font-size: 15px; fill: #52606d; }.group-title { font-size: 19px; font-weight: 700; fill: #16324f; }.entity { fill: #ffffff; stroke: #334e68; stroke-width: 2.1; }.entity-text { font-size: 15px; font-weight: 700; fill: #102a43; }.diamond { fill: #fff7d6; stroke: #b7791f; stroke-width: 2; }.diamond-text { font-size: 10.5px; font-weight: 700; fill: #7c4a03; }.rel-line { stroke: #486581; stroke-width: 1.9; }.card-bg { fill: #ffffff; stroke: #dd6b20; stroke-width: 1.5; }.card { font-size: 12px; font-weight: 700; fill: #c05621; }.legend { font-size: 13px; fill: #243b53; }]]></style></defs>
+<rect width="100%" height="100%" fill="#fbfcfe"/>
+<g transform="scale(1.28)">
+<text x="36" y="44" class="title">E-commerce Conceptual ER Diagram</text>
+<text x="36" y="69" class="subtitle">High-resolution horizontal ERD for reports, generated from New_schema.sql.</text>
+<rect x="1520" y="18" width="1280" height="52" rx="12" fill="#ffffff" stroke="#d9e2ec"/>
+<text x="1538" y="50" class="legend">Rectangle = entity | diamond = relationship | circles = cardinality | audit links such as created_by / updated_by are hidden for readability.</text>
+<rect x="36" y="102" width="288" height="790" rx="22" fill="#eef6ff" stroke="#82b1ff" stroke-width="2"/>
+<text x="54" y="134" class="group-title">Users</text>
+<rect x="436" y="82" width="688" height="750" rx="22" fill="#effcf4" stroke="#73c98b" stroke-width="2"/>
+<text x="454" y="114" class="group-title">Catalog</text>
+<rect x="1266" y="82" width="288" height="850" rx="22" fill="#fff7ed" stroke="#f2b56b" stroke-width="2"/>
+<text x="1284" y="114" class="group-title">Modifiers</text>
+<rect x="1676" y="82" width="288" height="790" rx="22" fill="#fff1f8" stroke="#eb9ccc" stroke-width="2"/>
+<text x="1694" y="114" class="group-title">Offers</text>
+<rect x="2106" y="82" width="698" height="1110" rx="22" fill="#f4f0ff" stroke="#b29bff" stroke-width="2"/>
+<text x="2124" y="114" class="group-title">Checkout</text>
+<rect x="2966" y="232" width="288" height="500" rx="22" fill="#ecfffb" stroke="#63d3c0" stroke-width="2"/>
+<text x="2984" y="264" class="group-title">Reviews</text>
+<line x1="180.0" y1="244" x2="180.0" y2="312.0" class="rel-line"/>
+<line x1="180.0" y1="312.0" x2="180.0" y2="380" class="rel-line"/>
+<polygon points="180.0,290.0 226.0,312.0 180.0,334.0 134.0,312.0" class="diamond"/>
+<text x="180.0" y="316.0" text-anchor="middle" class="diamond-text">has</text>
+<circle cx="180.0" cy="264.4" r="12" class="card-bg"/>
+<text x="180.0" y="268.4" text-anchor="middle" class="card">1</text>
+<circle cx="180.0" cy="359.6" r="12" class="card-bg"/>
+<text x="180.0" y="363.6" text-anchor="middle" class="card">N</text>
+<line x1="180.0" y1="244" x2="180.0" y2="412.0" class="rel-line"/>
+<line x1="180.0" y1="412.0" x2="180.0" y2="580" class="rel-line"/>
+<polygon points="180.0,390.0 226.0,412.0 180.0,434.0 134.0,412.0" class="diamond"/>
+<text x="180.0" y="416.0" text-anchor="middle" class="diamond-text">logs</text>
+<circle cx="180.0" cy="294.4" r="12" class="card-bg"/>
+<text x="180.0" y="298.4" text-anchor="middle" class="card">1</text>
+<circle cx="180.0" cy="529.6" r="12" class="card-bg"/>
+<text x="180.0" y="533.6" text-anchor="middle" class="card">N</text>
+<path d="M 690 178 C 724 148, 732 166.0, 730.0 192.0" class="rel-line"/>
+<path d="M 822.0 192.0 C 820 218.0, 724 236, 690 206" class="rel-line"/>
+<polygon points="776,170.0 822.0,192.0 776,214.0 730.0,192.0" class="diamond"/>
+<text x="776" y="196.0" text-anchor="middle" class="diamond-text">parent</text>
+<circle cx="718" cy="166" r="12" class="card-bg"/>
+<text x="718" y="170" text-anchor="middle" class="card">1</text>
+<circle cx="718" cy="218" r="12" class="card-bg"/>
+<text x="718" y="222" text-anchor="middle" class="card">N</text>
+<line x1="690" y1="192.0" x2="780.0" y2="192.0" class="rel-line"/>
+<line x1="780.0" y1="192.0" x2="870" y2="192.0" class="rel-line"/>
+<polygon points="780.0,170.0 826.0,192.0 780.0,214.0 734.0,192.0" class="diamond"/>
+<text x="780.0" y="196.0" text-anchor="middle" class="diamond-text">classifies</text>
+<circle cx="717.0" cy="192.0" r="12" class="card-bg"/>
+<text x="717.0" y="196.0" text-anchor="middle" class="card">1</text>
+<circle cx="843.0" cy="192.0" r="12" class="card-bg"/>
+<text x="843.0" y="196.0" text-anchor="middle" class="card">N</text>
+<line x1="980.0" y1="224" x2="980.0" y2="332.0" class="rel-line"/>
+<line x1="980.0" y1="332.0" x2="980.0" y2="440" class="rel-line"/>
+<polygon points="980.0,310.0 1026.0,332.0 980.0,354.0 934.0,332.0" class="diamond"/>
+<text x="980.0" y="336.0" text-anchor="middle" class="diamond-text">offers</text>
+<circle cx="980.0" cy="256.4" r="12" class="card-bg"/>
+<text x="980.0" y="260.4" text-anchor="middle" class="card">1</text>
+<circle cx="980.0" cy="407.6" r="12" class="card-bg"/>
+<text x="980.0" y="411.6" text-anchor="middle" class="card">N</text>
+<line x1="690" y1="472.0" x2="780.0" y2="472.0" class="rel-line"/>
+<line x1="780.0" y1="472.0" x2="870" y2="472.0" class="rel-line"/>
+<polygon points="780.0,450.0 826.0,472.0 780.0,494.0 734.0,472.0" class="diamond"/>
+<text x="780.0" y="476.0" text-anchor="middle" class="diamond-text">used in</text>
+<circle cx="717.0" cy="472.0" r="12" class="card-bg"/>
+<text x="717.0" y="476.0" text-anchor="middle" class="card">1</text>
+<circle cx="843.0" cy="472.0" r="12" class="card-bg"/>
+<text x="843.0" y="476.0" text-anchor="middle" class="card">N</text>
+<line x1="980.0" y1="224" x2="875.0" y2="472.0" class="rel-line"/>
+<line x1="875.0" y1="472.0" x2="770.0" y2="720" class="rel-line"/>
+<polygon points="875.0,450.0 921.0,472.0 875.0,494.0 829.0,472.0" class="diamond"/>
+<text x="875.0" y="476.0" text-anchor="middle" class="diamond-text">maps</text>
+<circle cx="948.5" cy="298.4" r="12" class="card-bg"/>
+<text x="948.5" y="302.4" text-anchor="middle" class="card">1</text>
+<circle cx="801.5" cy="645.6" r="12" class="card-bg"/>
+<text x="801.5" y="649.6" text-anchor="middle" class="card">N</text>
+<line x1="580.0" y1="224" x2="675.0" y2="472.0" class="rel-line"/>
+<line x1="675.0" y1="472.0" x2="770.0" y2="720" class="rel-line"/>
+<polygon points="675.0,450.0 721.0,472.0 675.0,494.0 629.0,472.0" class="diamond"/>
+<text x="675.0" y="476.0" text-anchor="middle" class="diamond-text">groups</text>
+<circle cx="608.5" cy="298.4" r="12" class="card-bg"/>
+<text x="608.5" y="302.4" text-anchor="middle" class="card">1</text>
+<circle cx="741.5" cy="645.6" r="12" class="card-bg"/>
+<text x="741.5" y="649.6" text-anchor="middle" class="card">N</text>
+<line x1="980.0" y1="224" x2="980.0" y2="472.0" class="rel-line"/>
+<line x1="980.0" y1="472.0" x2="980.0" y2="720" class="rel-line"/>
+<polygon points="980.0,450.0 1026.0,472.0 980.0,494.0 934.0,472.0" class="diamond"/>
+<text x="980.0" y="476.0" text-anchor="middle" class="diamond-text">shown by</text>
+<circle cx="980.0" cy="298.4" r="12" class="card-bg"/>
+<text x="980.0" y="302.4" text-anchor="middle" class="card">1</text>
+<circle cx="980.0" cy="645.6" r="12" class="card-bg"/>
+<text x="980.0" y="649.6" text-anchor="middle" class="card">N</text>
+<line x1="980.0" y1="504" x2="980.0" y2="612.0" class="rel-line"/>
+<line x1="980.0" y1="612.0" x2="980.0" y2="720" class="rel-line"/>
+<polygon points="980.0,590.0 1026.0,612.0 980.0,634.0 934.0,612.0" class="diamond"/>
+<text x="980.0" y="616.0" text-anchor="middle" class="diamond-text">variant img</text>
+<circle cx="980.0" cy="536.4" r="12" class="card-bg"/>
+<text x="980.0" y="540.4" text-anchor="middle" class="card">1</text>
+<circle cx="980.0" cy="687.6" r="12" class="card-bg"/>
+<text x="980.0" y="691.6" text-anchor="middle" class="card">N</text>
+<line x1="1410.0" y1="224" x2="1410.0" y2="302.0" class="rel-line"/>
+<line x1="1410.0" y1="302.0" x2="1410.0" y2="380" class="rel-line"/>
+<polygon points="1410.0,280.0 1456.0,302.0 1410.0,324.0 1364.0,302.0" class="diamond"/>
+<text x="1410.0" y="306.0" text-anchor="middle" class="diamond-text">available as</text>
+<circle cx="1410.0" cy="247.4" r="12" class="card-bg"/>
+<text x="1410.0" y="251.4" text-anchor="middle" class="card">1</text>
+<circle cx="1410.0" cy="356.6" r="12" class="card-bg"/>
+<text x="1410.0" y="360.6" text-anchor="middle" class="card">N</text>
+<line x1="1090" y1="192.0" x2="1195.0" y2="302.0" class="rel-line"/>
+<line x1="1195.0" y1="302.0" x2="1300" y2="412.0" class="rel-line"/>
+<polygon points="1195.0,280.0 1241.0,302.0 1195.0,324.0 1149.0,302.0" class="diamond"/>
+<text x="1195.0" y="306.0" text-anchor="middle" class="diamond-text">allows</text>
+<circle cx="1121.5" cy="225.0" r="12" class="card-bg"/>
+<text x="1121.5" y="229.0" text-anchor="middle" class="card">1</text>
+<circle cx="1268.5" cy="379.0" r="12" class="card-bg"/>
+<text x="1268.5" y="383.0" text-anchor="middle" class="card">N</text>
+<line x1="1090" y1="472.0" x2="1195.0" y2="442.0" class="rel-line"/>
+<line x1="1195.0" y1="442.0" x2="1300" y2="412.0" class="rel-line"/>
+<polygon points="1195.0,420.0 1241.0,442.0 1195.0,464.0 1149.0,442.0" class="diamond"/>
+<text x="1195.0" y="446.0" text-anchor="middle" class="diamond-text">portion allows</text>
+<circle cx="1121.5" cy="463.0" r="12" class="card-bg"/>
+<text x="1121.5" y="467.0" text-anchor="middle" class="card">1</text>
+<circle cx="1268.5" cy="421.0" r="12" class="card-bg"/>
+<text x="1268.5" y="425.0" text-anchor="middle" class="card">N</text>
+<line x1="980.0" y1="224" x2="1195.0" y2="412.0" class="rel-line"/>
+<line x1="1195.0" y1="412.0" x2="1410.0" y2="600" class="rel-line"/>
+<polygon points="1195.0,390.0 1241.0,412.0 1195.0,434.0 1149.0,412.0" class="diamond"/>
+<text x="1195.0" y="416.0" text-anchor="middle" class="diamond-text">has combo</text>
+<circle cx="1044.5" cy="280.4" r="12" class="card-bg"/>
+<text x="1044.5" y="284.4" text-anchor="middle" class="card">1</text>
+<circle cx="1345.5" cy="543.6" r="12" class="card-bg"/>
+<text x="1345.5" y="547.6" text-anchor="middle" class="card">N</text>
+<line x1="1090" y1="472.0" x2="1195.0" y2="552.0" class="rel-line"/>
+<line x1="1195.0" y1="552.0" x2="1300" y2="632.0" class="rel-line"/>
+<polygon points="1195.0,530.0 1241.0,552.0 1195.0,574.0 1149.0,552.0" class="diamond"/>
+<text x="1195.0" y="556.0" text-anchor="middle" class="diamond-text">combo for</text>
+<circle cx="1121.5" cy="496.0" r="12" class="card-bg"/>
+<text x="1121.5" y="500.0" text-anchor="middle" class="card">1</text>
+<circle cx="1268.5" cy="608.0" r="12" class="card-bg"/>
+<text x="1268.5" y="612.0" text-anchor="middle" class="card">N</text>
+<line x1="1410.0" y1="664" x2="1410.0" y2="742.0" class="rel-line"/>
+<line x1="1410.0" y1="742.0" x2="1410.0" y2="820" class="rel-line"/>
+<polygon points="1410.0,720.0 1456.0,742.0 1410.0,764.0 1364.0,742.0" class="diamond"/>
+<text x="1410.0" y="746.0" text-anchor="middle" class="diamond-text">contains</text>
+<circle cx="1410.0" cy="687.4" r="12" class="card-bg"/>
+<text x="1410.0" y="691.4" text-anchor="middle" class="card">1</text>
+<circle cx="1410.0" cy="796.6" r="12" class="card-bg"/>
+<text x="1410.0" y="800.6" text-anchor="middle" class="card">N</text>
+<line x1="1410.0" y1="224" x2="1410.0" y2="522.0" class="rel-line"/>
+<line x1="1410.0" y1="522.0" x2="1410.0" y2="820" class="rel-line"/>
+<polygon points="1410.0,500.0 1456.0,522.0 1410.0,544.0 1364.0,522.0" class="diamond"/>
+<text x="1410.0" y="526.0" text-anchor="middle" class="diamond-text">item</text>
+<circle cx="1410.0" cy="313.4" r="12" class="card-bg"/>
+<text x="1410.0" y="317.4" text-anchor="middle" class="card">1</text>
+<circle cx="1410.0" cy="730.6" r="12" class="card-bg"/>
+<text x="1410.0" y="734.6" text-anchor="middle" class="card">N</text>
+<line x1="1820.0" y1="224" x2="1820.0" y2="327.0" class="rel-line"/>
+<line x1="1820.0" y1="327.0" x2="1820.0" y2="430" class="rel-line"/>
+<polygon points="1820.0,305.0 1866.0,327.0 1820.0,349.0 1774.0,327.0" class="diamond"/>
+<text x="1820.0" y="331.0" text-anchor="middle" class="diamond-text">targets</text>
+<circle cx="1820.0" cy="254.9" r="12" class="card-bg"/>
+<text x="1820.0" y="258.9" text-anchor="middle" class="card">1</text>
+<circle cx="1820.0" cy="399.1" r="12" class="card-bg"/>
+<text x="1820.0" y="403.1" text-anchor="middle" class="card">N</text>
+<line x1="1090" y1="192.0" x2="1400.0" y2="327.0" class="rel-line"/>
+<line x1="1400.0" y1="327.0" x2="1710" y2="462.0" class="rel-line"/>
+<polygon points="1400.0,305.0 1446.0,327.0 1400.0,349.0 1354.0,327.0" class="diamond"/>
+<text x="1400.0" y="331.0" text-anchor="middle" class="diamond-text">offer product</text>
+<circle cx="1183.0" cy="232.5" r="12" class="card-bg"/>
+<text x="1183.0" y="236.5" text-anchor="middle" class="card">1</text>
+<circle cx="1617.0" cy="421.5" r="12" class="card-bg"/>
+<text x="1617.0" y="425.5" text-anchor="middle" class="card">N</text>
+<line x1="690" y1="192.0" x2="1200.0" y2="327.0" class="rel-line"/>
+<line x1="1200.0" y1="327.0" x2="1710" y2="462.0" class="rel-line"/>
+<polygon points="1200.0,305.0 1246.0,327.0 1200.0,349.0 1154.0,327.0" class="diamond"/>
+<text x="1200.0" y="331.0" text-anchor="middle" class="diamond-text">offer category</text>
+<circle cx="843.0" cy="232.5" r="12" class="card-bg"/>
+<text x="843.0" y="236.5" text-anchor="middle" class="card">1</text>
+<circle cx="1557.0" cy="421.5" r="12" class="card-bg"/>
+<text x="1557.0" y="425.5" text-anchor="middle" class="card">N</text>
+<line x1="690" y1="192.0" x2="1200.0" y2="192.0" class="rel-line"/>
+<line x1="1200.0" y1="192.0" x2="1710" y2="192.0" class="rel-line"/>
+<polygon points="1200.0,170.0 1246.0,192.0 1200.0,214.0 1154.0,192.0" class="diamond"/>
+<text x="1200.0" y="196.0" text-anchor="middle" class="diamond-text">cat offer</text>
+<circle cx="843.0" cy="192.0" r="12" class="card-bg"/>
+<text x="843.0" y="196.0" text-anchor="middle" class="card">1</text>
+<circle cx="1557.0" cy="192.0" r="12" class="card-bg"/>
+<text x="1557.0" y="196.0" text-anchor="middle" class="card">N</text>
+<line x1="1090" y1="192.0" x2="1400.0" y2="192.0" class="rel-line"/>
+<line x1="1400.0" y1="192.0" x2="1710" y2="192.0" class="rel-line"/>
+<polygon points="1400.0,170.0 1446.0,192.0 1400.0,214.0 1354.0,192.0" class="diamond"/>
+<text x="1400.0" y="196.0" text-anchor="middle" class="diamond-text">prod offer</text>
+<circle cx="1183.0" cy="192.0" r="12" class="card-bg"/>
+<text x="1183.0" y="196.0" text-anchor="middle" class="card">1</text>
+<circle cx="1617.0" cy="192.0" r="12" class="card-bg"/>
+<text x="1617.0" y="196.0" text-anchor="middle" class="card">N</text>
+<line x1="290" y1="212.0" x2="1215.0" y2="202.0" class="rel-line"/>
+<line x1="1215.0" y1="202.0" x2="2140" y2="192.0" class="rel-line"/>
+<polygon points="1215.0,180.0 1261.0,202.0 1215.0,224.0 1169.0,202.0" class="diamond"/>
+<text x="1215.0" y="206.0" text-anchor="middle" class="diamond-text">owns</text>
+<circle cx="567.5" cy="209.0" r="12" class="card-bg"/>
+<text x="567.5" y="213.0" text-anchor="middle" class="card">1</text>
+<circle cx="1862.5" cy="195.0" r="12" class="card-bg"/>
+<text x="1862.5" y="199.0" text-anchor="middle" class="card">1</text>
+<line x1="1930" y1="192.0" x2="2035.0" y2="192.0" class="rel-line"/>
+<line x1="2035.0" y1="192.0" x2="2140" y2="192.0" class="rel-line"/>
+<polygon points="2035.0,170.0 2081.0,192.0 2035.0,214.0 1989.0,192.0" class="diamond"/>
+<text x="2035.0" y="196.0" text-anchor="middle" class="diamond-text">applies</text>
+<circle cx="1961.5" cy="192.0" r="12" class="card-bg"/>
+<text x="1961.5" y="196.0" text-anchor="middle" class="card">1</text>
+<circle cx="2108.5" cy="192.0" r="12" class="card-bg"/>
+<text x="2108.5" y="196.0" text-anchor="middle" class="card">N</text>
+<line x1="2250.0" y1="224" x2="2250.0" y2="307.0" class="rel-line"/>
+<line x1="2250.0" y1="307.0" x2="2250.0" y2="390" class="rel-line"/>
+<polygon points="2250.0,285.0 2296.0,307.0 2250.0,329.0 2204.0,307.0" class="diamond"/>
+<text x="2250.0" y="311.0" text-anchor="middle" class="diamond-text">contains</text>
+<circle cx="2250.0" cy="248.9" r="12" class="card-bg"/>
+<text x="2250.0" y="252.9" text-anchor="middle" class="card">1</text>
+<circle cx="2250.0" cy="365.1" r="12" class="card-bg"/>
+<text x="2250.0" y="369.1" text-anchor="middle" class="card">N</text>
+<line x1="1090" y1="192.0" x2="1615.0" y2="307.0" class="rel-line"/>
+<line x1="1615.0" y1="307.0" x2="2140" y2="422.0" class="rel-line"/>
+<polygon points="1615.0,285.0 1661.0,307.0 1615.0,329.0 1569.0,307.0" class="diamond"/>
+<text x="1615.0" y="311.0" text-anchor="middle" class="diamond-text">selected</text>
+<circle cx="1247.5" cy="226.5" r="12" class="card-bg"/>
+<text x="1247.5" y="230.5" text-anchor="middle" class="card">1</text>
+<circle cx="1982.5" cy="387.5" r="12" class="card-bg"/>
+<text x="1982.5" y="391.5" text-anchor="middle" class="card">N</text>
+<line x1="1090" y1="472.0" x2="1615.0" y2="447.0" class="rel-line"/>
+<line x1="1615.0" y1="447.0" x2="2140" y2="422.0" class="rel-line"/>
+<polygon points="1615.0,425.0 1661.0,447.0 1615.0,469.0 1569.0,447.0" class="diamond"/>
+<text x="1615.0" y="451.0" text-anchor="middle" class="diamond-text">portion</text>
+<circle cx="1247.5" cy="464.5" r="12" class="card-bg"/>
+<text x="1247.5" y="468.5" text-anchor="middle" class="card">1</text>
+<circle cx="1982.5" cy="429.5" r="12" class="card-bg"/>
+<text x="1982.5" y="433.5" text-anchor="middle" class="card">N</text>
+<line x1="1520" y1="632.0" x2="1830.0" y2="527.0" class="rel-line"/>
+<line x1="1830.0" y1="527.0" x2="2140" y2="422.0" class="rel-line"/>
+<polygon points="1830.0,505.0 1876.0,527.0 1830.0,549.0 1784.0,527.0" class="diamond"/>
+<text x="1830.0" y="531.0" text-anchor="middle" class="diamond-text">combo</text>
+<circle cx="1613.0" cy="600.5" r="12" class="card-bg"/>
+<text x="1613.0" y="604.5" text-anchor="middle" class="card">1</text>
+<circle cx="2047.0" cy="453.5" r="12" class="card-bg"/>
+<text x="2047.0" y="457.5" text-anchor="middle" class="card">N</text>
+<line x1="1930" y1="192.0" x2="2035.0" y2="307.0" class="rel-line"/>
+<line x1="2035.0" y1="307.0" x2="2140" y2="422.0" class="rel-line"/>
+<polygon points="2035.0,285.0 2081.0,307.0 2035.0,329.0 1989.0,307.0" class="diamond"/>
+<text x="2035.0" y="311.0" text-anchor="middle" class="diamond-text">discount</text>
+<circle cx="1961.5" cy="226.5" r="12" class="card-bg"/>
+<text x="1961.5" y="230.5" text-anchor="middle" class="card">1</text>
+<circle cx="2108.5" cy="387.5" r="12" class="card-bg"/>
+<text x="2108.5" y="391.5" text-anchor="middle" class="card">N</text>
+<line x1="2250.0" y1="454" x2="2250.0" y2="537.0" class="rel-line"/>
+<line x1="2250.0" y1="537.0" x2="2250.0" y2="620" class="rel-line"/>
+<polygon points="2250.0,515.0 2296.0,537.0 2250.0,559.0 2204.0,537.0" class="diamond"/>
+<text x="2250.0" y="541.0" text-anchor="middle" class="diamond-text">uses</text>
+<circle cx="2250.0" cy="478.9" r="12" class="card-bg"/>
+<text x="2250.0" y="482.9" text-anchor="middle" class="card">1</text>
+<circle cx="2250.0" cy="595.1" r="12" class="card-bg"/>
+<text x="2250.0" y="599.1" text-anchor="middle" class="card">N</text>
+<line x1="1520" y1="192.0" x2="1830.0" y2="422.0" class="rel-line"/>
+<line x1="1830.0" y1="422.0" x2="2140" y2="652.0" class="rel-line"/>
+<polygon points="1830.0,400.0 1876.0,422.0 1830.0,444.0 1784.0,422.0" class="diamond"/>
+<text x="1830.0" y="426.0" text-anchor="middle" class="diamond-text">picked</text>
+<circle cx="1613.0" cy="261.0" r="12" class="card-bg"/>
+<text x="1613.0" y="265.0" text-anchor="middle" class="card">1</text>
+<circle cx="2047.0" cy="583.0" r="12" class="card-bg"/>
+<text x="2047.0" y="587.0" text-anchor="middle" class="card">N</text>
+<line x1="290" y1="212.0" x2="1420.0" y2="202.0" class="rel-line"/>
+<line x1="1420.0" y1="202.0" x2="2550" y2="192.0" class="rel-line"/>
+<polygon points="1420.0,180.0 1466.0,202.0 1420.0,224.0 1374.0,202.0" class="diamond"/>
+<text x="1420.0" y="206.0" text-anchor="middle" class="diamond-text">places</text>
+<circle cx="629.0" cy="209.0" r="12" class="card-bg"/>
+<text x="629.0" y="213.0" text-anchor="middle" class="card">1</text>
+<circle cx="2211.0" cy="195.0" r="12" class="card-bg"/>
+<text x="2211.0" y="199.0" text-anchor="middle" class="card">N</text>
+<line x1="290" y1="412.0" x2="1420.0" y2="302.0" class="rel-line"/>
+<line x1="1420.0" y1="302.0" x2="2550" y2="192.0" class="rel-line"/>
+<polygon points="1420.0,280.0 1466.0,302.0 1420.0,324.0 1374.0,302.0" class="diamond"/>
+<text x="1420.0" y="306.0" text-anchor="middle" class="diamond-text">ships to</text>
+<circle cx="629.0" cy="379.0" r="12" class="card-bg"/>
+<text x="629.0" y="383.0" text-anchor="middle" class="card">1</text>
+<circle cx="2211.0" cy="225.0" r="12" class="card-bg"/>
+<text x="2211.0" y="229.0" text-anchor="middle" class="card">N</text>
+<line x1="2660.0" y1="224" x2="2660.0" y2="307.0" class="rel-line"/>
+<line x1="2660.0" y1="307.0" x2="2660.0" y2="390" class="rel-line"/>
+<polygon points="2660.0,285.0 2706.0,307.0 2660.0,329.0 2614.0,307.0" class="diamond"/>
+<text x="2660.0" y="311.0" text-anchor="middle" class="diamond-text">contains</text>
+<circle cx="2660.0" cy="248.9" r="12" class="card-bg"/>
+<text x="2660.0" y="252.9" text-anchor="middle" class="card">1</text>
+<circle cx="2660.0" cy="365.1" r="12" class="card-bg"/>
+<text x="2660.0" y="369.1" text-anchor="middle" class="card">N</text>
+<line x1="1090" y1="192.0" x2="1820.0" y2="307.0" class="rel-line"/>
+<line x1="1820.0" y1="307.0" x2="2550" y2="422.0" class="rel-line"/>
+<polygon points="1820.0,285.0 1866.0,307.0 1820.0,329.0 1774.0,307.0" class="diamond"/>
+<text x="1820.0" y="311.0" text-anchor="middle" class="diamond-text">ordered</text>
+<circle cx="1309.0" cy="226.5" r="12" class="card-bg"/>
+<text x="1309.0" y="230.5" text-anchor="middle" class="card">1</text>
+<circle cx="2331.0" cy="387.5" r="12" class="card-bg"/>
+<text x="2331.0" y="391.5" text-anchor="middle" class="card">N</text>
+<line x1="1090" y1="472.0" x2="1820.0" y2="447.0" class="rel-line"/>
+<line x1="1820.0" y1="447.0" x2="2550" y2="422.0" class="rel-line"/>
+<polygon points="1820.0,425.0 1866.0,447.0 1820.0,469.0 1774.0,447.0" class="diamond"/>
+<text x="1820.0" y="451.0" text-anchor="middle" class="diamond-text">portion</text>
+<circle cx="1309.0" cy="464.5" r="12" class="card-bg"/>
+<text x="1309.0" y="468.5" text-anchor="middle" class="card">1</text>
+<circle cx="2331.0" cy="429.5" r="12" class="card-bg"/>
+<text x="2331.0" y="433.5" text-anchor="middle" class="card">N</text>
+<line x1="1520" y1="192.0" x2="2035.0" y2="307.0" class="rel-line"/>
+<line x1="2035.0" y1="307.0" x2="2550" y2="422.0" class="rel-line"/>
+<polygon points="2035.0,285.0 2081.0,307.0 2035.0,329.0 1989.0,307.0" class="diamond"/>
+<text x="2035.0" y="311.0" text-anchor="middle" class="diamond-text">modifier</text>
+<circle cx="1674.5" cy="226.5" r="12" class="card-bg"/>
+<text x="1674.5" y="230.5" text-anchor="middle" class="card">1</text>
+<circle cx="2395.5" cy="387.5" r="12" class="card-bg"/>
+<text x="2395.5" y="391.5" text-anchor="middle" class="card">N</text>
+<line x1="2660.0" y1="454" x2="2660.0" y2="537.0" class="rel-line"/>
+<line x1="2660.0" y1="537.0" x2="2660.0" y2="620" class="rel-line"/>
+<polygon points="2660.0,515.0 2706.0,537.0 2660.0,559.0 2614.0,537.0" class="diamond"/>
+<text x="2660.0" y="541.0" text-anchor="middle" class="diamond-text">has</text>
+<circle cx="2660.0" cy="478.9" r="12" class="card-bg"/>
+<text x="2660.0" y="482.9" text-anchor="middle" class="card">1</text>
+<circle cx="2660.0" cy="595.1" r="12" class="card-bg"/>
+<text x="2660.0" y="599.1" text-anchor="middle" class="card">N</text>
+<line x1="1520" y1="192.0" x2="2035.0" y2="422.0" class="rel-line"/>
+<line x1="2035.0" y1="422.0" x2="2550" y2="652.0" class="rel-line"/>
+<polygon points="2035.0,400.0 2081.0,422.0 2035.0,444.0 1989.0,422.0" class="diamond"/>
+<text x="2035.0" y="426.0" text-anchor="middle" class="diamond-text">line</text>
+<circle cx="1674.5" cy="261.0" r="12" class="card-bg"/>
+<text x="1674.5" y="265.0" text-anchor="middle" class="card">1</text>
+<circle cx="2395.5" cy="583.0" r="12" class="card-bg"/>
+<text x="2395.5" y="587.0" text-anchor="middle" class="card">N</text>
+<line x1="2660.0" y1="224" x2="2660.0" y2="537.0" class="rel-line"/>
+<line x1="2660.0" y1="537.0" x2="2660.0" y2="850" class="rel-line"/>
+<polygon points="2660.0,515.0 2706.0,537.0 2660.0,559.0 2614.0,537.0" class="diamond"/>
+<text x="2660.0" y="541.0" text-anchor="middle" class="diamond-text">paid by</text>
+<circle cx="2660.0" cy="317.9" r="12" class="card-bg"/>
+<text x="2660.0" y="321.9" text-anchor="middle" class="card">1</text>
+<circle cx="2660.0" cy="756.1" r="12" class="card-bg"/>
+<text x="2660.0" y="760.1" text-anchor="middle" class="card">N</text>
+<line x1="2660.0" y1="224" x2="2660.0" y2="652.0" class="rel-line"/>
+<line x1="2660.0" y1="652.0" x2="2660.0" y2="1080" class="rel-line"/>
+<polygon points="2660.0,630.0 2706.0,652.0 2660.0,674.0 2614.0,652.0" class="diamond"/>
+<text x="2660.0" y="656.0" text-anchor="middle" class="diamond-text">cancel req</text>
+<circle cx="2660.0" cy="352.4" r="12" class="card-bg"/>
+<text x="2660.0" y="356.4" text-anchor="middle" class="card">1</text>
+<circle cx="2660.0" cy="951.6" r="12" class="card-bg"/>
+<text x="2660.0" y="955.6" text-anchor="middle" class="card">N</text>
+<line x1="290" y1="212.0" x2="1420.0" y2="662.0" class="rel-line"/>
+<line x1="1420.0" y1="662.0" x2="2550" y2="1112.0" class="rel-line"/>
+<polygon points="1420.0,640.0 1466.0,662.0 1420.0,684.0 1374.0,662.0" class="diamond"/>
+<text x="1420.0" y="666.0" text-anchor="middle" class="diamond-text">requests</text>
+<circle cx="629.0" cy="347.0" r="12" class="card-bg"/>
+<text x="629.0" y="351.0" text-anchor="middle" class="card">1</text>
+<circle cx="2211.0" cy="977.0" r="12" class="card-bg"/>
+<text x="2211.0" y="981.0" text-anchor="middle" class="card">N</text>
+<line x1="1820.0" y1="224" x2="1820.0" y2="492.0" class="rel-line"/>
+<line x1="1820.0" y1="492.0" x2="1820.0" y2="760" class="rel-line"/>
+<polygon points="1820.0,470.0 1866.0,492.0 1820.0,514.0 1774.0,492.0" class="diamond"/>
+<text x="1820.0" y="496.0" text-anchor="middle" class="diamond-text">used in</text>
+<circle cx="1820.0" cy="304.4" r="12" class="card-bg"/>
+<text x="1820.0" y="308.4" text-anchor="middle" class="card">1</text>
+<circle cx="1820.0" cy="679.6" r="12" class="card-bg"/>
+<text x="1820.0" y="683.6" text-anchor="middle" class="card">N</text>
+<line x1="290" y1="212.0" x2="1000.0" y2="502.0" class="rel-line"/>
+<line x1="1000.0" y1="502.0" x2="1710" y2="792.0" class="rel-line"/>
+<polygon points="1000.0,480.0 1046.0,502.0 1000.0,524.0 954.0,502.0" class="diamond"/>
+<text x="1000.0" y="506.0" text-anchor="middle" class="diamond-text">consumes</text>
+<circle cx="503.0" cy="299.0" r="12" class="card-bg"/>
+<text x="503.0" y="303.0" text-anchor="middle" class="card">1</text>
+<circle cx="1497.0" cy="705.0" r="12" class="card-bg"/>
+<text x="1497.0" y="709.0" text-anchor="middle" class="card">N</text>
+<line x1="2550" y1="192.0" x2="2240.0" y2="492.0" class="rel-line"/>
+<line x1="2240.0" y1="492.0" x2="1930" y2="792.0" class="rel-line"/>
+<polygon points="2240.0,470.0 2286.0,492.0 2240.0,514.0 2194.0,492.0" class="diamond"/>
+<text x="2240.0" y="496.0" text-anchor="middle" class="diamond-text">records</text>
+<circle cx="2457.0" cy="282.0" r="12" class="card-bg"/>
+<text x="2457.0" y="286.0" text-anchor="middle" class="card">1</text>
+<circle cx="2023.0" cy="702.0" r="12" class="card-bg"/>
+<text x="2023.0" y="706.0" text-anchor="middle" class="card">N</text>
+<line x1="1090" y1="192.0" x2="2045.0" y2="267.0" class="rel-line"/>
+<line x1="2045.0" y1="267.0" x2="3000" y2="342.0" class="rel-line"/>
+<polygon points="2045.0,245.0 2091.0,267.0 2045.0,289.0 1999.0,267.0" class="diamond"/>
+<text x="2045.0" y="271.0" text-anchor="middle" class="diamond-text">reviewed</text>
+<circle cx="1376.5" cy="214.5" r="12" class="card-bg"/>
+<text x="1376.5" y="218.5" text-anchor="middle" class="card">1</text>
+<circle cx="2713.5" cy="319.5" r="12" class="card-bg"/>
+<text x="2713.5" y="323.5" text-anchor="middle" class="card">N</text>
+<line x1="290" y1="212.0" x2="1645.0" y2="277.0" class="rel-line"/>
+<line x1="1645.0" y1="277.0" x2="3000" y2="342.0" class="rel-line"/>
+<polygon points="1645.0,255.0 1691.0,277.0 1645.0,299.0 1599.0,277.0" class="diamond"/>
+<text x="1645.0" y="281.0" text-anchor="middle" class="diamond-text">writes</text>
+<circle cx="696.5" cy="231.5" r="12" class="card-bg"/>
+<text x="696.5" y="235.5" text-anchor="middle" class="card">1</text>
+<circle cx="2593.5" cy="322.5" r="12" class="card-bg"/>
+<text x="2593.5" y="326.5" text-anchor="middle" class="card">N</text>
+<line x1="2770" y1="192.0" x2="2885.0" y2="267.0" class="rel-line"/>
+<line x1="2885.0" y1="267.0" x2="3000" y2="342.0" class="rel-line"/>
+<polygon points="2885.0,245.0 2931.0,267.0 2885.0,289.0 2839.0,267.0" class="diamond"/>
+<text x="2885.0" y="271.0" text-anchor="middle" class="diamond-text">verifies</text>
+<circle cx="2804.5" cy="214.5" r="12" class="card-bg"/>
+<text x="2804.5" y="218.5" text-anchor="middle" class="card">1</text>
+<circle cx="2965.5" cy="319.5" r="12" class="card-bg"/>
+<text x="2965.5" y="323.5" text-anchor="middle" class="card">N</text>
+<line x1="3110.0" y1="374" x2="3110.0" y2="497.0" class="rel-line"/>
+<line x1="3110.0" y1="497.0" x2="3110.0" y2="620" class="rel-line"/>
+<polygon points="3110.0,475.0 3156.0,497.0 3110.0,519.0 3064.0,497.0" class="diamond"/>
+<text x="3110.0" y="501.0" text-anchor="middle" class="diamond-text">helpful</text>
+<circle cx="3110.0" cy="410.9" r="12" class="card-bg"/>
+<text x="3110.0" y="414.9" text-anchor="middle" class="card">1</text>
+<circle cx="3110.0" cy="583.1" r="12" class="card-bg"/>
+<text x="3110.0" y="587.1" text-anchor="middle" class="card">N</text>
+<line x1="290" y1="212.0" x2="1645.0" y2="432.0" class="rel-line"/>
+<line x1="1645.0" y1="432.0" x2="3000" y2="652.0" class="rel-line"/>
+<polygon points="1645.0,410.0 1691.0,432.0 1645.0,454.0 1599.0,432.0" class="diamond"/>
+<text x="1645.0" y="436.0" text-anchor="middle" class="diamond-text">votes</text>
+<circle cx="696.5" cy="278.0" r="12" class="card-bg"/>
+<text x="696.5" y="282.0" text-anchor="middle" class="card">1</text>
+<circle cx="2593.5" cy="586.0" r="12" class="card-bg"/>
+<text x="2593.5" y="590.0" text-anchor="middle" class="card">N</text>
+<rect x="70" y="180" width="220" height="64" rx="13" class="entity"/>
+<text x="180.0" y="218" text-anchor="middle" class="entity-text">User</text>
+<rect x="70" y="380" width="220" height="64" rx="13" class="entity"/>
+<text x="180.0" y="418" text-anchor="middle" class="entity-text">User Address</text>
+<rect x="70" y="580" width="220" height="64" rx="13" class="entity"/>
+<text x="180.0" y="618" text-anchor="middle" class="entity-text">Activity Log</text>
+<rect x="70" y="780" width="220" height="64" rx="13" class="entity"/>
+<text x="180.0" y="818" text-anchor="middle" class="entity-text">App Settings</text>
+<rect x="470" y="160" width="220" height="64" rx="13" class="entity"/>
+<text x="580.0" y="198" text-anchor="middle" class="entity-text">Category</text>
+<rect x="870" y="160" width="220" height="64" rx="13" class="entity"/>
+<text x="980.0" y="198" text-anchor="middle" class="entity-text">Product</text>
+<rect x="470" y="440" width="220" height="64" rx="13" class="entity"/>
+<text x="580.0" y="478" text-anchor="middle" class="entity-text">Portion</text>
+<rect x="870" y="440" width="220" height="64" rx="13" class="entity"/>
+<text x="980.0" y="478" text-anchor="middle" class="entity-text">Product Portion</text>
+<rect x="660" y="720" width="220" height="64" rx="13" class="entity"/>
+<text x="770.0" y="758" text-anchor="middle" class="entity-text">Product Category</text>
+<rect x="870" y="720" width="220" height="64" rx="13" class="entity"/>
+<text x="980.0" y="758" text-anchor="middle" class="entity-text">Product Image</text>
+<rect x="1300" y="160" width="220" height="64" rx="13" class="entity"/>
+<text x="1410.0" y="198" text-anchor="middle" class="entity-text">Modifier</text>
+<rect x="1300" y="380" width="220" height="64" rx="13" class="entity"/>
+<text x="1410.0" y="418" text-anchor="middle" class="entity-text">Modifier Portion</text>
+<rect x="1300" y="600" width="220" height="64" rx="13" class="entity"/>
+<text x="1410.0" y="638" text-anchor="middle" class="entity-text">Modifier Combination</text>
+<rect x="1300" y="820" width="220" height="64" rx="13" class="entity"/>
+<text x="1410.0" y="858" text-anchor="middle" class="entity-text">Combination Item</text>
+<rect x="1710" y="160" width="220" height="64" rx="13" class="entity"/>
+<text x="1820.0" y="198" text-anchor="middle" class="entity-text">Offer</text>
+<rect x="1710" y="430" width="220" height="64" rx="13" class="entity"/>
+<text x="1820.0" y="468" text-anchor="middle" class="entity-text">Offer Product Category</text>
+<rect x="1710" y="760" width="220" height="64" rx="13" class="entity"/>
+<text x="1820.0" y="798" text-anchor="middle" class="entity-text">Offer Usage</text>
+<rect x="2140" y="160" width="220" height="64" rx="13" class="entity"/>
+<text x="2250.0" y="198" text-anchor="middle" class="entity-text">Cart</text>
+<rect x="2140" y="390" width="220" height="64" rx="13" class="entity"/>
+<text x="2250.0" y="428" text-anchor="middle" class="entity-text">Cart Item</text>
+<rect x="2140" y="620" width="220" height="64" rx="13" class="entity"/>
+<text x="2250.0" y="658" text-anchor="middle" class="entity-text">Cart Item Modifier</text>
+<rect x="2550" y="160" width="220" height="64" rx="13" class="entity"/>
+<text x="2660.0" y="198" text-anchor="middle" class="entity-text">Order</text>
+<rect x="2550" y="390" width="220" height="64" rx="13" class="entity"/>
+<text x="2660.0" y="428" text-anchor="middle" class="entity-text">Order Item</text>
+<rect x="2550" y="620" width="220" height="64" rx="13" class="entity"/>
+<text x="2660.0" y="658" text-anchor="middle" class="entity-text">Order Item Modifier</text>
+<rect x="2550" y="850" width="220" height="64" rx="13" class="entity"/>
+<text x="2660.0" y="888" text-anchor="middle" class="entity-text">Payment</text>
+<rect x="2550" y="1080" width="220" height="64" rx="13" class="entity"/>
+<text x="2660.0" y="1118" text-anchor="middle" class="entity-text">Cancel Request</text>
+<rect x="3000" y="310" width="220" height="64" rx="13" class="entity"/>
+<text x="3110.0" y="348" text-anchor="middle" class="entity-text">Product Review</text>
+<rect x="3000" y="620" width="220" height="64" rx="13" class="entity"/>
+<text x="3110.0" y="658" text-anchor="middle" class="entity-text">Review Helpful</text>
+</g></svg>

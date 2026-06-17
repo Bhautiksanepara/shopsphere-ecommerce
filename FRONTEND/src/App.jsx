@@ -3,12 +3,14 @@ import { useDispatch } from "react-redux";
 import { ThemeProvider } from "./context/ThemeContext";
 import { ToastProvider } from "./context/ToastContext";
 import AppRoutes from "./routes/AppRoutes";
+import LoadingSplash from "./components/common/LoadingSplash";
 import { refreshAccessToken } from "./redux/slices/authSlice";
 
 function App() {
   const [darkMode, setDarkMode] = useState(
     () => localStorage.getItem("shopsphere-theme") === "dark",
   );
+  const [isBackendAwake, setIsBackendAwake] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -17,11 +19,12 @@ function App() {
   }, [darkMode]);
 
   useEffect(() => {
+    if (!isBackendAwake) return;
     const refreshToken = localStorage.getItem("refreshToken");
     if (refreshToken) {
       dispatch(refreshAccessToken());
     }
-  }, [dispatch]);
+  }, [dispatch, isBackendAwake]);
 
   const themeValue = useMemo(
     () => ({
@@ -34,7 +37,11 @@ function App() {
   return (
     <ThemeProvider value={themeValue}>
       <ToastProvider>
-        <AppRoutes />
+        {isBackendAwake ? (
+          <AppRoutes />
+        ) : (
+          <LoadingSplash onAwake={() => setIsBackendAwake(true)} />
+        )}
       </ToastProvider>
     </ThemeProvider>
   );

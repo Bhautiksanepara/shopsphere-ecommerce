@@ -83,6 +83,16 @@ app.get("/", (req, res) => {
     },
   });
 });
+
+// Health check endpoint for monitoring / keep-alive
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Server is alive and healthy",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 app.use("/api/order", orderRouter);
 app.use("/api/order-item", orderItemRouter);
 

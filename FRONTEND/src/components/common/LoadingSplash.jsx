@@ -23,9 +23,15 @@ function LoadingSplash({ onAwake }) {
   const [dots, setDots] = useState("");
   const retryTimerRef = useRef(null);
   const secondsTimerRef = useRef(null);
+  const elapsedRef = useRef(0);
 
   const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || "http://localhost:3000")
     .replace(/\/+$/, "");
+
+  // Update the ref to prevent stale closures in server polling
+  useEffect(() => {
+    elapsedRef.current = elapsedSeconds;
+  }, [elapsedSeconds]);
 
   // Determine current phase based on time (12s per phase for 48s total)
   const phase = elapsedSeconds < 12 ? 1 : elapsedSeconds < 24 ? 2 : elapsedSeconds < 36 ? 3 : 4;
@@ -77,8 +83,10 @@ function LoadingSplash({ onAwake }) {
 
       if (response.ok) {
         if (isDemoMode) {
-          // Hold the splash screen for demonstration/verification purposes
-          console.log("Server is awake (Demo Mode active: holding splash)");
+          // Hold the splash screen for demonstration purposes; log only occasionally
+          if (elapsedRef.current % 5 === 0) {
+            console.log("Server is awake (Demo Mode active: holding splash)");
+          }
           return;
         }
 
@@ -93,23 +101,22 @@ function LoadingSplash({ onAwake }) {
       }
     } catch (error) {
       console.log("Keep-alive connection check failed: server is starting up or unreachable.");
-      // If server doesn't respond and it's been more than 50s, mark as potentially failed
-      if (elapsedSeconds > 55) {
+      // If server doesn't respond and it's been more than 55s, mark as potentially failed
+      if (elapsedRef.current > 55) {
         setStatus("failed");
       }
     }
   };
 
-  // Poll server every 2.5 seconds
+  // Poll server every 2.5 seconds (only registered once to avoid multiple intervals/spam)
   useEffect(() => {
     checkServer(); // First check immediately
-
     retryTimerRef.current = setInterval(checkServer, 2500);
 
     return () => {
       if (retryTimerRef.current) clearInterval(retryTimerRef.current);
     };
-  }, [elapsedSeconds]);
+  }, []);
 
   const handleManualRetry = () => {
     setStatus("connecting");
@@ -119,7 +126,17 @@ function LoadingSplash({ onAwake }) {
 
   const renderAnimation = () => {
     switch (phase) {
-      case 1:
+      case 1: {
+        const loopIdx = Math.floor(elapsedSeconds / 4) % 4;
+        
+        // Determine coordinate locations of click targets for cursor transform-origin
+        const clickOriginStr = 
+          loopIdx === 0 ? "180px 180px" : 
+          loopIdx === 1 ? "60px 60px" : 
+          loopIdx === 2 ? "60px 180px" : "180px 60px";
+        const clickCx = (loopIdx === 0 || loopIdx === 3) ? "180" : "60";
+        const clickCy = (loopIdx === 0 || loopIdx === 2) ? "180" : "60";
+
         return (
           <svg viewBox="0 0 240 240" style={{ overflow: "visible" }} className="h-full w-full">
             <defs>
@@ -147,17 +164,38 @@ function LoadingSplash({ onAwake }) {
               @keyframes p1-card1 { 0%, 100% { opacity: 0; transform: scale(0.8); } 5%, 72% { opacity: 1; transform: scale(1); } 75%, 95% { opacity: 0; transform: scale(0.8); } }
               @keyframes p1-card2 { 0%, 100% { opacity: 0; transform: scale(0.8); } 8%, 20% { opacity: 1; transform: scale(1); } 22%, 40% { opacity: 1; transform: scale(1.08); filter: drop-shadow(0 10px 20px rgba(47,122,111,0.15)); } 42%, 72% { opacity: 1; transform: scale(1); } 75%, 95% { opacity: 0; transform: scale(0.8); } }
               @keyframes p1-card3 { 0%, 100% { opacity: 0; transform: scale(0.8); } 11%, 72% { opacity: 1; transform: scale(1); } 75%, 95% { opacity: 0; transform: scale(0.8); } }
-              @keyframes p1-card4 { 
+              @keyframes p1-card4-inactive { 0%, 100% { opacity: 0; transform: scale(0.8); } 14%, 72% { opacity: 1; transform: scale(1); } 75%, 95% { opacity: 0; transform: scale(0.8); } }
+              
+              @keyframes p1-card-selected-0 { 
                 0%, 100% { opacity: 0; transform: translate(0px, 0px) scale(0.8); } 
                 14%, 58% { opacity: 1; transform: translate(0px, 0px) scale(1); } 
-                60%, 72% { opacity: 1; transform: translate(0px, 0px) scale(1.15); } 
-                75%, 95% { opacity: 1; transform: translate(-60px, -60px) scale(1.4); } 
+                60%, 72% { opacity: 1; transform: translate(0px, 0px) scale(1.15); filter: url(#p1-glow); } 
+                75%, 95% { opacity: 1; transform: translate(-60px, -60px) scale(1.4); filter: url(#p1-glow); } 
               }
+              @keyframes p1-card-selected-1 { 
+                0%, 100% { opacity: 0; transform: translate(0px, 0px) scale(0.8); } 
+                14%, 58% { opacity: 1; transform: translate(0px, 0px) scale(1); } 
+                60%, 72% { opacity: 1; transform: translate(0px, 0px) scale(1.15); filter: url(#p1-glow); } 
+                75%, 95% { opacity: 1; transform: translate(60px, 60px) scale(1.4); filter: url(#p1-glow); } 
+              }
+              @keyframes p1-card-selected-2 { 
+                0%, 100% { opacity: 0; transform: translate(0px, 0px) scale(0.8); } 
+                14%, 58% { opacity: 1; transform: translate(0px, 0px) scale(1); } 
+                60%, 72% { opacity: 1; transform: translate(0px, 0px) scale(1.15); filter: url(#p1-glow); } 
+                75%, 95% { opacity: 1; transform: translate(60px, -60px) scale(1.4); filter: url(#p1-glow); } 
+              }
+              @keyframes p1-card-selected-3 { 
+                0%, 100% { opacity: 0; transform: translate(0px, 0px) scale(0.8); } 
+                14%, 58% { opacity: 1; transform: translate(0px, 0px) scale(1); } 
+                60%, 72% { opacity: 1; transform: translate(0px, 0px) scale(1.15); filter: url(#p1-glow); } 
+                75%, 95% { opacity: 1; transform: translate(-60px, 60px) scale(1.4); filter: url(#p1-glow); } 
+              }
+
               @keyframes p1-grid-dim {
                 0%, 72% { opacity: 1; }
                 75%, 95% { opacity: 0.15; }
               }
-              @keyframes p1-cursor {
+              @keyframes p1-cursor-0 {
                 0% { transform: translate(240px, 240px); opacity: 0; }
                 10% { transform: translate(220px, 220px); opacity: 1; }
                 22%, 40% { transform: translate(180px, 60px); opacity: 1; }
@@ -166,6 +204,34 @@ function LoadingSplash({ onAwake }) {
                 76% { transform: translate(180px, 180px) scale(1); opacity: 1; }
                 82%, 100% { transform: translate(240px, 240px); opacity: 0; }
               }
+              @keyframes p1-cursor-1 {
+                0% { transform: translate(240px, 240px); opacity: 0; }
+                10% { transform: translate(220px, 220px); opacity: 1; }
+                22%, 40% { transform: translate(180px, 60px); opacity: 1; }
+                58%, 73% { transform: translate(60px, 60px); opacity: 1; }
+                74% { transform: translate(60px, 60px) scale(0.8); opacity: 1; }
+                76% { transform: translate(60px, 60px) scale(1); opacity: 1; }
+                82%, 100% { transform: translate(240px, 240px); opacity: 0; }
+              }
+              @keyframes p1-cursor-2 {
+                0% { transform: translate(240px, 240px); opacity: 0; }
+                10% { transform: translate(220px, 220px); opacity: 1; }
+                22%, 40% { transform: translate(180px, 60px); opacity: 1; }
+                58%, 73% { transform: translate(60px, 180px); opacity: 1; }
+                74% { transform: translate(60px, 180px) scale(0.8); opacity: 1; }
+                76% { transform: translate(60px, 180px) scale(1); opacity: 1; }
+                82%, 100% { transform: translate(240px, 240px); opacity: 0; }
+              }
+              @keyframes p1-cursor-3 {
+                0% { transform: translate(240px, 240px); opacity: 0; }
+                10% { transform: translate(220px, 220px); opacity: 1; }
+                22%, 40% { transform: translate(60px, 180px); opacity: 1; }
+                58%, 73% { transform: translate(180px, 60px); opacity: 1; }
+                74% { transform: translate(180px, 60px) scale(0.8); opacity: 1; }
+                76% { transform: translate(180px, 60px) scale(1); opacity: 1; }
+                82%, 100% { transform: translate(240px, 240px); opacity: 0; }
+              }
+
               @keyframes p1-click-ring {
                 0%, 72% { transform: scale(0); opacity: 0; }
                 74% { transform: scale(0.4); opacity: 0.8; }
@@ -181,8 +247,11 @@ function LoadingSplash({ onAwake }) {
 
             {/* Card 1: Top-Left - Smartwatch */}
             <g transform="translate(20, 20)">
-              <g style={{ animation: "p1-card1 4s ease-in-out infinite", transformOrigin: "40px 40px" }} filter="url(#p1-shadow)">
-                <rect x="0" y="0" width="80" height="80" rx="16" fill="url(#p1-cardGrad)" stroke="#e8e2d5" strokeWidth="1.5" />
+              <g style={{ 
+                animation: loopIdx === 1 ? "p1-card-selected-1 4s cubic-bezier(0.25, 1, 0.5, 1) infinite" : "p1-card1 4s ease-in-out infinite", 
+                transformOrigin: "40px 40px" 
+              }} filter="url(#p1-shadow)">
+                <rect x="0" y="0" width="80" height="80" rx="16" fill={loopIdx === 1 ? "url(#p1-activeGrad)" : "url(#p1-cardGrad)"} stroke={loopIdx === 1 ? "#2f7a6f" : "#e8e2d5"} strokeWidth={loopIdx === 1 ? "2" : "1.5"} />
                 <rect x="36" y="16" width="8" height="48" rx="2" fill="#1f3d36" opacity="0.15" />
                 <circle cx="40" cy="40" r="16" fill="#1f3d36" />
                 <circle cx="40" cy="40" r="13" fill="none" stroke="#2f7a6f" strokeWidth="1.5" />
@@ -190,11 +259,14 @@ function LoadingSplash({ onAwake }) {
               </g>
             </g>
 
-            {/* Card 2: Top-Right - Headphones (Hover target 1) */}
+            {/* Card 2: Top-Right - Headphones (Hover target 1 & Click target 4) */}
             <g transform="translate(140, 20)">
-              <g style={{ animation: "p1-card2 4s ease-in-out infinite", transformOrigin: "40px 40px" }} filter="url(#p1-shadow)">
-                <rect x="0" y="0" width="80" height="80" rx="16" fill="url(#p1-cardGrad)" stroke="#e8e2d5" strokeWidth="1.5" />
-                <path d="M26,46 C26,30 54,30 54,46" fill="none" stroke="#1f3d36" strokeWidth="3.5" strokeLinecap="round" />
+              <g style={{ 
+                animation: loopIdx === 3 ? "p1-card-selected-3 4s cubic-bezier(0.25, 1, 0.5, 1) infinite" : "p1-card2 4s ease-in-out infinite", 
+                transformOrigin: "40px 40px" 
+              }} filter="url(#p1-shadow)">
+                <rect x="0" y="0" width="80" height="80" rx="16" fill={loopIdx === 3 ? "url(#p1-activeGrad)" : "url(#p1-cardGrad)"} stroke={loopIdx === 3 ? "#2f7a6f" : "#e8e2d5"} strokeWidth={loopIdx === 3 ? "2" : "1.5"} />
+                <path d="M26,46 C26,30 54,30 54,46" fill="none" stroke={loopIdx === 3 ? "#1f4d46" : "#1f3d36"} strokeWidth="3.5" strokeLinecap="round" />
                 <rect x="21" y="40" width="7" height="14" rx="2" fill="#2f7a6f" />
                 <rect x="52" y="40" width="7" height="14" rx="2" fill="#2f7a6f" />
               </g>
@@ -202,16 +274,22 @@ function LoadingSplash({ onAwake }) {
 
             {/* Card 3: Bottom-Left - T-Shirt */}
             <g transform="translate(20, 140)">
-              <g style={{ animation: "p1-card3 4s ease-in-out infinite", transformOrigin: "40px 40px" }} filter="url(#p1-shadow)">
-                <rect x="0" y="0" width="80" height="80" rx="16" fill="url(#p1-cardGrad)" stroke="#e8e2d5" strokeWidth="1.5" />
+              <g style={{ 
+                animation: loopIdx === 2 ? "p1-card-selected-2 4s cubic-bezier(0.25, 1, 0.5, 1) infinite" : "p1-card3 4s ease-in-out infinite", 
+                transformOrigin: "40px 40px" 
+              }} filter="url(#p1-shadow)">
+                <rect x="0" y="0" width="80" height="80" rx="16" fill={loopIdx === 2 ? "url(#p1-activeGrad)" : "url(#p1-cardGrad)"} stroke={loopIdx === 2 ? "#2f7a6f" : "#e8e2d5"} strokeWidth={loopIdx === 2 ? "2" : "1.5"} />
                 <path d="M25,28 L34,28 C36,32 44,32 46,28 L55,28 L64,36 L58,42 L54,39 L54,58 L26,58 L26,39 L22,42 L16,36 Z" fill="#2f7a6f" opacity="0.85" />
               </g>
             </g>
 
             {/* Card 4: Bottom-Right - Sneaker (Hover & Click target) */}
             <g transform="translate(140, 140)">
-              <g style={{ animation: "p1-card4 4s cubic-bezier(0.25, 1, 0.5, 1) infinite", transformOrigin: "40px 40px" }} filter="url(#p1-shadow)">
-                <rect x="0" y="0" width="80" height="80" rx="16" fill="url(#p1-activeGrad)" stroke="#2f7a6f" strokeWidth="2" />
+              <g style={{ 
+                animation: loopIdx === 0 ? "p1-card-selected-0 4s cubic-bezier(0.25, 1, 0.5, 1) infinite" : "p1-card4-inactive 4s ease-in-out infinite", 
+                transformOrigin: "40px 40px" 
+              }} filter="url(#p1-shadow)">
+                <rect x="0" y="0" width="80" height="80" rx="16" fill={loopIdx === 0 ? "url(#p1-activeGrad)" : "url(#p1-cardGrad)"} stroke={loopIdx === 0 ? "#2f7a6f" : "#e8e2d5"} strokeWidth={loopIdx === 0 ? "2" : "1.5"} />
                 
                 {/* Sneaker Graphic */}
                 <g transform="translate(40, 40) scale(1.15)" fill="url(#p1-accentGrad)">
@@ -223,16 +301,55 @@ function LoadingSplash({ onAwake }) {
             </g>
 
             {/* Click animation ring */}
-            <circle style={{ animation: "p1-click-ring 4s ease-out infinite", transformOrigin: "180px 180px" }} cx="180" cy="180" r="15" fill="none" stroke="#ef4444" strokeWidth="3.5" />
-            <circle style={{ animation: "p1-click-ring 4s ease-out infinite", transformOrigin: "180px 180px" }} cx="180" cy="180" r="28" fill="none" stroke="#ef4444" strokeWidth="1.5" opacity="0.5" />
+            <circle style={{ animation: "p1-click-ring 4s ease-out infinite", transformOrigin: clickOriginStr }} cx={clickCx} cy={clickCy} r="15" fill="none" stroke="#ef4444" strokeWidth="3.5" />
+            <circle style={{ animation: "p1-click-ring 4s ease-out infinite", transformOrigin: clickOriginStr }} cx={clickCx} cy={clickCy} r="28" fill="none" stroke="#ef4444" strokeWidth="1.5" opacity="0.5" />
 
             {/* Mouse Cursor */}
-            <g style={{ animation: "p1-cursor 4s cubic-bezier(0.25, 1, 0.5, 1) infinite" }}>
+            <g style={{ animation: `p1-cursor-${loopIdx} 4s cubic-bezier(0.25, 1, 0.5, 1) infinite` }}>
               <path d="M0,0 L7,20 L12,14 L20,18 Z" fill="#1f3d36" stroke="white" strokeWidth="2" strokeLinejoin="round" />
             </g>
           </svg>
         );
-      case 2:
+      }
+      case 2: {
+        const loopIdx = Math.floor((elapsedSeconds - 12) / 3) % 4;
+
+        const renderFlyingItem = (idx) => {
+          switch (idx) {
+            case 1: // Smartwatch
+              return (
+                <g transform="translate(0, 0) scale(1.15)" fill="url(#p2-shoeGrad)">
+                  <rect x="-4" y="-18" width="8" height="36" rx="2" fill="#1f3d36" opacity="0.15" />
+                  <circle cx="0" cy="0" r="11" fill="#1f3d36" />
+                  <circle cx="0" cy="0" r="9" fill="none" stroke="#2f7a6f" strokeWidth="1.5" />
+                  <rect x="-5" y="-1.5" width="10" height="3" rx="0.5" fill="#fff" opacity="0.8" />
+                </g>
+              );
+            case 2: // T-Shirt
+              return (
+                <g transform="translate(0, 0) scale(0.95)" fill="url(#p2-shoeGrad)">
+                  <path d="M-22,-18 L-14,-18 C-12,-14 -4,-14 -2,-18 L6,-18 L14,-10 L8,-4 L4,-7 L4,12 L-14,12 L-14,-7 L-18,-4 L-22,-10 Z" opacity="0.9" />
+                </g>
+              );
+            case 3: // Headphones
+              return (
+                <g transform="translate(0, 0) scale(0.95)" fill="none" stroke="url(#p2-shoeGrad)" strokeWidth="3.5" strokeLinecap="round">
+                  <path d="M-14,6 C-14,-10 14,-10 14,6" />
+                  <rect x="-18" y="2" width="6" height="10" rx="2" fill="#2f7a6f" stroke="none" />
+                  <rect x="12" y="2" width="6" height="10" rx="2" fill="#2f7a6f" stroke="none" />
+                </g>
+              );
+            case 0:
+            default: // Sneaker
+              return (
+                <g transform="translate(0, 0) scale(0.85)" fill="url(#p2-shoeGrad)">
+                  <path d="M-18,8 C-12,9 -6,11 5,11 C12,11 18,5 20,2 L18,-1 C12,1 4,6 -10,5 Z" />
+                  <path d="M-17,6 C-10,7 2,4 8,0 C12,-3 16,-8 18,-11 L6,-14 C2,-11 -4,-10 -8,-5 C-12,-2 -15,3 -17,6 Z" />
+                </g>
+              );
+          }
+        };
+
         return (
           <svg viewBox="0 0 240 240" style={{ overflow: "visible" }} className="h-full w-full">
             <defs>
@@ -251,23 +368,24 @@ function LoadingSplash({ onAwake }) {
 
             <style>{`
               @keyframes p2-sneaker {
-                0% { transform: translate(50px, 50px) scale(1) rotate(0deg); opacity: 1; }
-                15% { transform: translate(60px, 30px) scale(0.95) rotate(-15deg); }
-                50% { transform: translate(115px, 80px) scale(0.65) rotate(-55deg); opacity: 0.9; }
-                60% { transform: translate(125px, 112px) scale(0.3) rotate(-85deg); opacity: 0; }
-                100% { transform: translate(125px, 112px) scale(0.3) rotate(-85deg); opacity: 0; }
+                0%        { transform: translate(45px, 45px) scale(1) rotate(0deg); opacity: 1; }
+                15%       { transform: translate(55px, 25px) scale(0.95) rotate(-15deg); opacity: 1; }
+                45%       { transform: translate(95px, 50px) scale(0.8) rotate(-45deg); opacity: 1; }
+                58%       { transform: translate(126px, 100px) scale(0.65) rotate(-72deg); opacity: 1; }
+                65%       { transform: translate(126px, 118px) scale(0.48) rotate(-83deg); opacity: 0.85; }
+                73%, 100% { transform: translate(126px, 138px) scale(0.25) rotate(-90deg); opacity: 0; }
               }
               @keyframes p2-cart {
-                0%, 55%, 100% { transform: translateY(0) scale(1); }
-                60% { transform: translateY(8px) scale(1.12, 0.82); }
-                68% { transform: translateY(-16px) scale(0.88, 1.15); }
-                76% { transform: translateY(3px) scale(1.04, 0.96); }
-                84% { transform: translateY(0) scale(1); }
+                0%, 62%, 100% { transform: translateY(0) scale(1); }
+                68% { transform: translateY(8px) scale(1.12, 0.82); }
+                74% { transform: translateY(-16px) scale(0.88, 1.15); }
+                82% { transform: translateY(3px) scale(1.04, 0.96); }
+                90% { transform: translateY(0) scale(1); }
               }
               @keyframes p2-badge {
-                0%, 60% { transform: scale(0); opacity: 0; }
-                70% { transform: scale(1.4); opacity: 1; }
-                80% { transform: scale(0.9); opacity: 1; }
+                0%, 66% { transform: scale(0); opacity: 0; }
+                74% { transform: scale(1.4); opacity: 1; }
+                82% { transform: scale(0.9); opacity: 1; }
                 90%, 100% { transform: scale(1); opacity: 1; }
               }
               @keyframes p2-sparkle1 {
@@ -281,9 +399,9 @@ function LoadingSplash({ onAwake }) {
                 48%, 100% { transform: translate(110px, 75px) scale(0); opacity: 0; }
               }
               @keyframes p2-burst {
-                0%, 58% { transform: scale(0); opacity: 0; }
-                66% { transform: scale(1.2); opacity: 1; }
-                85%, 100% { transform: scale(2); opacity: 0; }
+                0%, 64% { transform: scale(0); opacity: 0; }
+                70% { transform: scale(1.2); opacity: 1; }
+                88%, 100% { transform: scale(2); opacity: 0; }
               }
               @keyframes p2-wheel-spin {
                 from { transform: rotate(0deg); }
@@ -296,26 +414,23 @@ function LoadingSplash({ onAwake }) {
             `}</style>
 
             {/* Path Guide */}
-            <path d="M50,50 Q90,20 125,112" fill="none" stroke="#2563eb" strokeWidth="1.5" strokeDasharray="4 4" opacity="0.15" />
+            <path d="M45,45 Q75,10 126,135" fill="none" stroke="#2563eb" strokeWidth="1.5" strokeDasharray="4 4" opacity="0.15" />
 
             {/* Flying Sparkles */}
             <circle style={{ animation: "p2-sparkle1 3s ease-out infinite" }} cx="0" cy="0" r="3" fill="#eab308" />
             <circle style={{ animation: "p2-sparkle2 3s ease-out infinite" }} cx="0" cy="0" r="2.5" fill="#eab308" />
 
-            {/* Flying Sneaker */}
-            <g style={{ animation: "p2-sneaker 3s cubic-bezier(0.25, 1, 0.5, 1) infinite", transformOrigin: "center" }}>
+            {/* Flying Item */}
+            <g style={{ animation: "p2-sneaker 3s cubic-bezier(0.25, 1, 0.5, 1) infinite", transformOrigin: "0px 0px" }}>
               <circle cx="0" cy="0" r="20" fill="#2f7a6f" opacity="0.1" />
-              <g transform="translate(0, 0) scale(0.85)" fill="url(#p2-shoeGrad)">
-                <path d="M-18,8 C-12,9 -6,11 5,11 C12,11 18,5 20,2 L18,-1 C12,1 4,6 -10,5 Z" />
-                <path d="M-17,6 C-10,7 2,4 8,0 C12,-3 16,-8 18,-11 L6,-14 C2,-11 -4,-10 -8,-5 C-12,-2 -15,3 -17,6 Z" />
-              </g>
+              {renderFlyingItem(loopIdx)}
             </g>
 
             {/* Cart Container with elastic effect (Translated to 126px for perfect bounding box centering) */}
             <g transform="translate(126, 140)" filter="url(#p2-shadow)">
               <g style={{ animation: "p2-cart 3s ease-in-out infinite", transformOrigin: "0px 10px" }}>
                 {/* Symmetrical basket profile */}
-                <path d="M-48,-28 L-36,-28 L-20,10 L20,10 L36,-28 L-28,-28" fill="none" stroke="url(#p2-cartGrad)" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M-48,-28 L-36,-28 L-20,10 L20,10 L36,-28 L48,-28" fill="none" stroke="url(#p2-cartGrad)" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
                 {/* Symmetrical inner grid details */}
                 <path d="M-17,-28 L-12,10 M-6,-28 L-4,10 M4,-28 L4,10 M14,-28 L12,10 M25,-28 L20,10" stroke="#60a5fa" strokeWidth="2.5" strokeLinecap="round" opacity="0.4" />
                 
@@ -347,13 +462,34 @@ function LoadingSplash({ onAwake }) {
             {/* Item Count Red Badge */}
             <g style={{ animation: "p2-badge 3s cubic-bezier(0.175, 0.885, 0.32, 1.275) infinite", transformOrigin: "158px 95px" }} transform="translate(158, 95)">
               <circle cx="0" cy="0" r="11" fill="#ef4444" filter="url(#p2-shadow)" />
-              <text x="0" y="3.5" fill="white" fontSize="10" fontWeight="900" textAnchor="middle" fontFamily="sans-serif">1</text>
+              <text x="0" y="3.5" fill="white" fontSize="10" fontWeight="900" textAnchor="middle" fontFamily="sans-serif">{loopIdx + 1}</text>
             </g>
           </svg>
         );
-      case 3:
+      }
+      case 3: {
+        const pins = [
+          { x: 160, y: 140 },
+          { x: 95, y: 110 },
+          { x: 130, y: 90 },
+          { x: 75, y: 150 }
+        ];
+        const loopIdx = Math.floor((elapsedSeconds - 24) / 3) % 4;
+        const activePin = pins[loopIdx < 0 ? 0 : loopIdx];
+
         return (
-          <svg viewBox="0 0 240 240" style={{ overflow: "visible" }} className="h-full w-full">
+          <svg 
+            viewBox="0 0 240 240" 
+            style={{ 
+              overflow: "visible",
+              "--active-pin-x": `${activePin.x}px`,
+              "--active-pin-y": `${activePin.y}px`,
+              "--active-pin-y-up": `${activePin.y - 15}px`,
+              "--active-drone-y": `${activePin.y - 65}px`,
+              "--active-package-start-y": `${activePin.y - 50}px`
+            }} 
+            className="h-full w-full"
+          >
             <defs>
               <linearGradient id="p3-droneBody" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#f97316" />
@@ -370,8 +506,10 @@ function LoadingSplash({ onAwake }) {
 
             <style>{`
               @keyframes p3-drone {
-                0%, 100% { transform: translate(50px, 45px); }
-                50% { transform: translate(50px, 35px); }
+                0% { transform: translate(65px, 80px); }
+                15% { transform: translate(65px, 60px); }
+                45%, 80% { transform: translate(var(--active-pin-x, 160px), var(--active-drone-y, 75px)); }
+                95%, 100% { transform: translate(240px, 40px); }
               }
               @keyframes p3-prop-L {
                 0% { transform: scaleX(1); }
@@ -384,25 +522,27 @@ function LoadingSplash({ onAwake }) {
                 100% { transform: scaleX(1); }
               }
               @keyframes p3-package {
-                0%, 25% { transform: translate(50px, 60px) scale(1); opacity: 1; }
-                55% { transform: translate(160px, 140px) scale(0.65); opacity: 0; }
-                100% { transform: translate(160px, 140px) scale(0.65); opacity: 0; }
+                0% { transform: translate(65px, 95px) scale(1); opacity: 1; }
+                15% { transform: translate(65px, 75px) scale(1); opacity: 1; }
+                45% { transform: translate(var(--active-pin-x, 160px), var(--active-package-start-y, 90px)) scale(1); opacity: 1; }
+                55% { transform: translate(var(--active-pin-x, 160px), var(--active-pin-y, 140px)) scale(0.65); opacity: 1; }
+                58%, 100% { transform: translate(var(--active-pin-x, 160px), var(--active-pin-y, 140px)) scale(0.65); opacity: 0; }
               }
-              @keyframes p3-pin {
-                0%, 50% { transform: translate(160px, 70px) scale(0); opacity: 0; }
-                65% { transform: translate(160px, 140px) scale(1.2, 0.85); opacity: 1; }
-                76% { transform: translate(160px, 122px) scale(0.9, 1.12); }
-                84% { transform: translate(160px, 140px) scale(1.05, 0.95); }
-                92%, 100% { transform: translate(160px, 140px) scale(1); opacity: 1; }
+              @keyframes p3-pin-bounce {
+                0%, 50% { transform: scale(0); opacity: 0; }
+                55% { transform: scale(1.2, 0.85); opacity: 1; }
+                66% { transform: translateY(-15px) scale(0.9, 1.12); }
+                74% { transform: scale(1.05, 0.95); }
+                82%, 100% { transform: scale(1); opacity: 1; }
               }
               @keyframes p3-path {
                 0% { stroke-dashoffset: 160; }
                 50%, 100% { stroke-dashoffset: 0; }
               }
-              @keyframes p3-radar {
-                0%, 62% { transform: translate(160px, 140px) scale(0.1); opacity: 0; }
-                75% { transform: translate(160px, 140px) scale(0.9); opacity: 0.6; }
-                92%, 100% { transform: translate(160px, 140px) scale(1.6); opacity: 0; }
+              @keyframes p3-radar-scale {
+                0%, 53% { transform: scale(0.1); opacity: 0; }
+                66% { transform: scale(0.9); opacity: 0.6; }
+                85%, 100% { transform: scale(1.6); opacity: 0; }
               }
             `}</style>
 
@@ -428,12 +568,37 @@ function LoadingSplash({ onAwake }) {
               <circle cx="35" cy="70" r="10" fill="none" stroke="#f97316" strokeWidth="1.5" opacity="0.3" />
             </g>
 
+            {/* Static Already-Dropped Pins */}
+            {pins.map((pin, index) => {
+              if (index < loopIdx) {
+                return (
+                  <g key={index} transform={`translate(${pin.x}, ${pin.y})`}>
+                    <ellipse cx="0" cy="2" rx="7" ry="2.5" fill="#1f3d36" opacity="0.25" />
+                    <path d="M0,0 C-9,-9 -15,-18 -15,-28 C-15,-38 -8,-45 0,-45 C8,-45 15,-38 15,-28 C15,-18 9,-9 0,0 Z" fill="#ea580c" opacity="0.7" />
+                    <circle cx="0" cy="-28" r="6" fill="#fef3c7" />
+                  </g>
+                );
+              }
+              return null;
+            })}
+
             {/* Neon Connection Path */}
-            <path className="p3-path" style={{ animation: "p3-path 3s linear infinite", strokeDasharray: 160 }} d="M65,140 Q110,110 160,140" fill="none" stroke="#ea580c" strokeWidth="3" strokeLinecap="round" opacity="0.75" />
+            <path 
+              className="p3-path" 
+              style={{ animation: "p3-path 3s linear infinite", strokeDasharray: 160 }} 
+              d={`M65,140 Q${(65 + activePin.x) / 2},${Math.min(140, activePin.y) - 30} ${activePin.x},${activePin.y}`}
+              fill="none" 
+              stroke="#ea580c" 
+              strokeWidth="3" 
+              strokeLinecap="round" 
+              opacity="0.75" 
+            />
 
             {/* Radar Wave rings expanding beneath pin */}
-            <g style={{ animation: "p3-radar 3s ease-out infinite", transformOrigin: "center" }}>
-              <ellipse cx="0" cy="3" rx="20" ry="7" fill="none" stroke="#ea580c" strokeWidth="2.5" />
+            <g transform={`translate(${activePin.x}, ${activePin.y})`}>
+              <g style={{ animation: "p3-radar-scale 3s ease-out infinite" }}>
+                <ellipse cx="0" cy="3" rx="20" ry="7" fill="none" stroke="#ea580c" strokeWidth="2.5" />
+              </g>
             </g>
 
             {/* Dropped Package */}
@@ -450,11 +615,15 @@ function LoadingSplash({ onAwake }) {
               <line x1="16" y1="-14" x2="16" y2="0" stroke="#475569" strokeWidth="2" />
 
               <g transform="translate(-24, -12)">
-                <ellipse cx="0" cy="0" rx="14" ry="3" fill="none" stroke="#64748b" strokeWidth="1.5" style={{ animation: "p3-prop-L 0.2s linear infinite", transformOrigin: "center" }} />
+                <g style={{ animation: "p3-prop-L 0.2s linear infinite", transformOrigin: "0px 0px" }}>
+                  <ellipse cx="0" cy="0" rx="14" ry="3" fill="none" stroke="#64748b" strokeWidth="1.5" />
+                </g>
                 <rect x="-3" y="-2" width="6" height="4" fill="#1e293b" />
               </g>
               <g transform="translate(24, -12)">
-                <ellipse cx="0" cy="0" rx="14" ry="3" fill="none" stroke="#64748b" strokeWidth="1.5" style={{ animation: "p3-prop-R 0.2s linear infinite", transformOrigin: "center" }} />
+                <g style={{ animation: "p3-prop-R 0.2s linear infinite", transformOrigin: "0px 0px" }}>
+                  <ellipse cx="0" cy="0" rx="14" ry="3" fill="none" stroke="#64748b" strokeWidth="1.5" />
+                </g>
                 <rect x="-3" y="-2" width="6" height="4" fill="#1e293b" />
               </g>
 
@@ -463,22 +632,50 @@ function LoadingSplash({ onAwake }) {
               <circle cx="1.5" cy="-1.5" r="1.5" fill="#ffffff" opacity="0.8" />
             </g>
 
-            {/* Pin drop */}
-            <g style={{ animation: "p3-pin 3s cubic-bezier(0.25, 1, 0.5, 1) infinite", transformOrigin: "0px 0px" }}>
-              <ellipse cx="0" cy="2" rx="7" ry="2.5" fill="#1f3d36" opacity="0.25" />
-              <path d="M0,0 C-9,-9 -15,-18 -15,-28 C-15,-38 -8,-45 0,-45 C8,-45 15,-38 15,-28 C15,-18 9,-9 0,0 Z" fill="#ea580c" />
-              <circle cx="0" cy="-28" r="6" fill="#fef3c7" />
+            {/* Active Pin drop */}
+            <g transform={`translate(${activePin.x}, ${activePin.y})`}>
+              <g style={{ animation: "p3-pin-bounce 3s cubic-bezier(0.25, 1, 0.5, 1) infinite", transformOrigin: "0px 0px" }}>
+                <ellipse cx="0" cy="2" rx="7" ry="2.5" fill="#1f3d36" opacity="0.25" />
+                <path d="M0,0 C-9,-9 -15,-18 -15,-28 C-15,-38 -8,-45 0,-45 C8,-45 15,-38 15,-28 C15,-18 9,-9 0,0 Z" fill="#ea580c" />
+                <circle cx="0" cy="-28" r="6" fill="#fef3c7" />
+              </g>
             </g>
           </svg>
         );
+      }
       case 4:
-      default:
+      default: {
+        const cardIndex = Math.max(0, Math.floor((elapsedSeconds - 36) / 3)) % 4;
+        const cards = [
+          { gradId: "p4-cardGrad-mc", name: "Mastercard" },
+          { gradId: "p4-cardGrad-visa", name: "Visa" },
+          { gradId: "p4-cardGrad-travel", name: "Travel" },
+          { gradId: "p4-cardGrad-vip", name: "VIP" }
+        ];
+        const card = cards[cardIndex];
+
         return (
           <svg viewBox="0 0 240 240" style={{ overflow: "visible", animation: "p4-shake 3s infinite" }} className="h-full w-full">
             <defs>
-              <linearGradient id="p4-cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#1e293b" />
-                <stop offset="100%" stopColor="#0f172a" />
+              <linearGradient id="p4-cardGrad-mc" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#6b1d2f" />
+                <stop offset="50%" stopColor="#4c121e" />
+                <stop offset="100%" stopColor="#2c050c" />
+              </linearGradient>
+              <linearGradient id="p4-cardGrad-visa" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#d4af37" />
+                <stop offset="50%" stopColor="#f3e5ab" />
+                <stop offset="100%" stopColor="#aa7c11" />
+              </linearGradient>
+              <linearGradient id="p4-cardGrad-travel" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#065f46" />
+                <stop offset="50%" stopColor="#047857" />
+                <stop offset="100%" stopColor="#064e3b" />
+              </linearGradient>
+              <linearGradient id="p4-cardGrad-vip" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#1f2937" />
+                <stop offset="50%" stopColor="#111827" />
+                <stop offset="100%" stopColor="#030712" />
               </linearGradient>
               <linearGradient id="p4-shimmer" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
@@ -562,13 +759,29 @@ function LoadingSplash({ onAwake }) {
               <rect x="86" y="24" width="68" height="6" rx="2" fill="#2f7a6f" opacity="0.6" />
               
               <line x1="86" y1="44" x2="134" y2="44" stroke="#1f3d36" strokeWidth="2.5" strokeLinecap="round" opacity="0.25" />
-              <line x1="86" y1="54" x2="114" y2="54" stroke="#1f3d36" strokeWidth="2.5" strokeLinecap="round" opacity="0.25" />
+              {/* Receipt Title */}
+              <rect x="86" y="22" width="68" height="6" rx="2" fill="#2f7a6f" opacity="0.6" />
+              
+              {/* Product list details */}
+              <text x="86" y="44" fill="#1f3d36" fontSize="7.5" fontWeight="bold" opacity="0.75" fontFamily="sans-serif">Sneaker</text>
+              <text x="154" y="44" fill="#1f3d36" fontSize="7.5" fontWeight="bold" opacity="0.75" fontFamily="sans-serif" textAnchor="end">$89.99</text>
+              
+              <text x="86" y="56" fill="#1f3d36" fontSize="7.5" fontWeight="bold" opacity="0.75" fontFamily="sans-serif">Smartwatch</text>
+              <text x="154" y="56" fill="#1f3d36" fontSize="7.5" fontWeight="bold" opacity="0.75" fontFamily="sans-serif" textAnchor="end">$149.50</text>
 
-              <line x1="86" y1="68" x2="154" y2="68" stroke="#1f3d36" strokeWidth="2" strokeDasharray="3 3" opacity="0.2" />
+              <text x="86" y="68" fill="#1f3d36" fontSize="7.5" fontWeight="bold" opacity="0.75" fontFamily="sans-serif">T-Shirt</text>
+              <text x="154" y="68" fill="#1f3d36" fontSize="7.5" fontWeight="bold" opacity="0.75" fontFamily="sans-serif" textAnchor="end">$24.99</text>
 
-              <line x1="86" y1="80" x2="124" y2="80" stroke="#1f3d36" strokeWidth="2.5" strokeLinecap="round" opacity="0.25" />
-              <line x1="86" y1="90" x2="104" y2="90" stroke="#1f3d36" strokeWidth="2.5" strokeLinecap="round" opacity="0.25" />
+              <text x="86" y="80" fill="#1f3d36" fontSize="7.5" fontWeight="bold" opacity="0.75" fontFamily="sans-serif">Headphones</text>
+              <text x="154" y="80" fill="#1f3d36" fontSize="7.5" fontWeight="bold" opacity="0.75" fontFamily="sans-serif" textAnchor="end">$79.99</text>
 
+              <line x1="86" y1="92" x2="154" y2="92" stroke="#1f3d36" strokeWidth="1" strokeDasharray="2 2" opacity="0.25" />
+
+              {/* Total summary */}
+              <text x="86" y="106" fill="#1f3d36" fontSize="9" fontWeight="900" fontFamily="sans-serif" opacity="0.9">Total</text>
+              <text x="154" y="106" fill="#1f3d36" fontSize="9" fontWeight="900" fontFamily="sans-serif" opacity="0.9" textAnchor="end">$344.47</text>
+
+              {/* Decorative stamp shadow/rings */}
               <circle cx="150" cy="85" r="4" fill="#1f3d36" opacity="0.15" />
               <circle cx="150" cy="85" r="8" fill="none" stroke="#1f3d36" strokeWidth="1.5" strokeDasharray="3 2" opacity="0.15" />
             </g>
@@ -580,9 +793,9 @@ function LoadingSplash({ onAwake }) {
               <path d="-6,-1 L-1,4 L7,-4" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
             </g>
 
-            {/* Credit Card */}
+            {/* Credit Card with dynamic style parameters */}
             <g style={{ animation: "p4-card 3s cubic-bezier(0.25, 1, 0.5, 1) infinite", transformOrigin: "0px 0px" }} filter="url(#p4-shadow)">
-              <rect x="-56" y="-34" width="112" height="68" rx="10" fill="url(#p4-cardGrad)" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
+              <rect x="-56" y="-34" width="112" height="68" rx="10" fill={`url(#${card.gradId})`} stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
               
               <g opacity="0.2">
                 <rect x="-65" y="-65" width="16" height="130" fill="url(#p4-shimmer)" style={{ animation: "p4-card-shimmer 3s ease-in-out infinite", transformOrigin: "center" }} />
@@ -600,6 +813,7 @@ function LoadingSplash({ onAwake }) {
             </g>
           </svg>
         );
+      }
     }
   };
 

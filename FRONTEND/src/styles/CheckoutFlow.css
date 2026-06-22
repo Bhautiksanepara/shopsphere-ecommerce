@@ -11,7 +11,7 @@
 
 @media (max-width: 640px) {
   .order-flow-shell {
-    padding: 1rem 0 3rem;
+    padding: 1rem 0.75rem 3rem;
   }
 }
 

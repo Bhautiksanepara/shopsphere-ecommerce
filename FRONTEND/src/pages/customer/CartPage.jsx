@@ -51,6 +51,7 @@ function CartPage() {
   const [loading, setLoading] = useState(true);
   const [updatingItem, setUpdatingItem] = useState(null);
   const [applyingOffer, setApplyingOffer] = useState(false);
+  const [applyingOfferId, setApplyingOfferId] = useState(null);
   const [offerCode, setOfferCode] = useState("");
   const [applicableOffers, setApplicableOffers] = useState([]);
   const [pulseCartItemId, setPulseCartItemId] = useState(null);
@@ -167,24 +168,27 @@ function CartPage() {
     });
   };
 
-  // Apply cart-level offer
-  const applyOffer = async () => {
-    if (!offerCode.trim()) return;
+  // Apply cart-level or specific offer
+  const applyOffer = async (specificOffer = null) => {
+    const code = specificOffer ? specificOffer.offer_name : offerCode;
+    if (!specificOffer && !code.trim()) return;
 
     setApplyingOffer(true);
 
     try {
-      // Find offer by code from applicable offers
-      const offer = applicableOffers.find(
+      // Find offer by code or use specificOffer
+      const offer = specificOffer || applicableOffers.find(
         (o) =>
-          o.offer_name?.toLowerCase() === offerCode.toLowerCase() ||
-          o.offer_id?.toString() === offerCode,
+          o.offer_name?.toLowerCase() === code.toLowerCase() ||
+          o.offer_id?.toString() === code,
       );
 
       if (!offer) {
         setApplyingOffer(false);
         return;
       }
+
+      setApplyingOfferId(offer.offer_id);
 
       // Check if it's a product offer or cart offer
       if (offer.type === "product") {
@@ -194,6 +198,7 @@ function CartPage() {
         );
         if (!cartItem) {
           setApplyingOffer(false);
+          setApplyingOfferId(null);
           return;
         }
 
@@ -216,6 +221,7 @@ function CartPage() {
       console.error("Error applying offer:", error);
     } finally {
       setApplyingOffer(false);
+      setApplyingOfferId(null);
     }
   };
 
@@ -236,6 +242,8 @@ function CartPage() {
       return;
     }
 
+    setApplyingOfferId(offer.offer_id);
+
     try {
       const response = await api.post(
         `/cart/items/${cartItem.cartItemId}/offer`,
@@ -244,26 +252,34 @@ function CartPage() {
       setCart(response.data.data);
     } catch (error) {
       console.error("Error applying product offer:", error);
+    } finally {
+      setApplyingOfferId(null);
     }
   };
 
   // Remove offer from a cart item
-  const removeItemOffer = async (cartItemId, offerName) => {
+  const removeItemOffer = async (cartItemId, offerId) => {
+    if (offerId) setApplyingOfferId(offerId);
     try {
       const response = await api.delete(`/cart/items/${cartItemId}/offer`);
       setCart(response.data.data);
     } catch (error) {
       console.error("Error removing item offer:", error);
+    } finally {
+      setApplyingOfferId(null);
     }
   };
 
   // Remove applied offer
-  const removeOffer = async () => {
+  const removeOffer = async (offerId = null) => {
+    if (offerId) setApplyingOfferId(offerId);
     try {
       const response = await api.delete("/cart/offer");
       setCart(response.data.data);
     } catch (error) {
       console.error("Error removing offer:", error);
+    } finally {
+      setApplyingOfferId(null);
     }
   };
 
@@ -442,10 +458,14 @@ function CartPage() {
               </span>
               <button
                 type="button"
-                onClick={removeOffer}
-                className="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
+                disabled={applyingOfferId === cart.appliedCartOffer.offer_id}
+                onClick={() => removeOffer(cart.appliedCartOffer.offer_id)}
+                className="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
               >
-                Remove
+                {applyingOfferId === cart.appliedCartOffer.offer_id && (
+                  <i className="pi pi-spinner pi-spin text-[10px]" />
+                )}
+                {applyingOfferId === cart.appliedCartOffer.offer_id ? "Removing..." : "Remove"}
               </button>
             </div>
           ) : null}
@@ -505,14 +525,14 @@ function CartPage() {
                               <Tag
                                 value={item.portionValue}
                                 severity="info"
-                                className="text-xs"
+                                className="text-xs !whitespace-normal break-words max-w-full"
                               />
                             )}
                             {item.combinationName ? (
                               <Tag
                                 value={item.combinationName}
                                 severity="secondary"
-                                className="text-xs"
+                                className="text-xs !whitespace-normal break-words max-w-full"
                               />
                             ) : item.modifiers && item.modifiers.length > 0 ? (
                               item.modifiers.map((mod, idx) => (
@@ -532,7 +552,7 @@ function CartPage() {
                                   key={idx}
                                   value={`${value}${add > 0 ? ` (+₹${add})` : ""}`}
                                   severity="secondary"
-                                  className="text-xs"
+                                  className="text-xs !whitespace-normal break-words max-w-full"
                                 />
                                   );
                                 })()
@@ -541,7 +561,7 @@ function CartPage() {
                               <Tag
                                 value={item.modifierValue}
                                 severity="secondary"
-                                className="text-xs"
+                                className="text-xs !whitespace-normal break-words max-w-full"
                               />
                             )}
                           </div>
@@ -549,23 +569,24 @@ function CartPage() {
 
                         {/* Applied Offer on Item */}
                         {item.appliedOffer && (
-                          <div className="mt-2 flex items-center gap-2">
+                          <div className="mt-2 flex flex-wrap items-center gap-2">
                             <Tag
                               value={`${item.appliedOffer.offer_name} (-₹${item.appliedOffer.discount_amount})`}
                               severity="success"
-                              className="text-xs"
+                              className="text-xs !whitespace-normal break-words max-w-full"
                             />
                             <button
+                              disabled={applyingOfferId === item.appliedOffer.offer_id}
                               onClick={() =>
                                 removeItemOffer(
                                   item.cartItemId,
-                                  item.appliedOffer.offer_name,
+                                  item.appliedOffer.offer_id,
                                 )
                               }
-                              className="text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 flex items-center gap-1"
+                              className="text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              <i className="pi pi-times" />
-                              Remove
+                              <i className={applyingOfferId === item.appliedOffer.offer_id ? "pi pi-spinner pi-spin" : "pi pi-times"} />
+                              {applyingOfferId === item.appliedOffer.offer_id ? "Removing..." : "Remove"}
                             </button>
                           </div>
                         )}
@@ -687,15 +708,17 @@ function CartPage() {
                       );
                       const isApplied =
                         productItem?.appliedOffer?.offer_id === offer.offer_id;
+                      const isApplying = applyingOfferId === offer.offer_id;
+                      const anyApplying = applyingOfferId !== null;
 
                       return (
                         <div
                           key={offer.offer_id}
-                          className={`cart-offer-row flex items-center justify-between p-3 rounded-lg transition-all ${
+                          className={`cart-offer-row flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-lg transition-all ${
                             isApplied
                               ? "bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30"
                               : "bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30"
-                          }`}
+                          } ${isApplying ? "opacity-50 pointer-events-none scale-[0.99] blur-[0.5px]" : ""}`}
                         >
                           <div className="cart-offer-copy flex items-center gap-3">
                             <i
@@ -715,7 +738,7 @@ function CartPage() {
                               </p>
                             </div>
                           </div>
-                          <div className="cart-offer-actions flex items-center gap-2">
+                          <div className="cart-offer-actions flex items-center gap-2 self-end sm:self-auto">
                             <Tag
                               value={
                                 offer.discount_type === "percentage"
@@ -726,8 +749,10 @@ function CartPage() {
                             />
                             {!isApplied && (
                               <Button
-                                label="Apply"
+                                label={isApplying ? "Applying..." : "Apply"}
+                                icon={isApplying ? "pi pi-spinner pi-spin" : undefined}
                                 size="small"
+                                disabled={anyApplying}
                                 onClick={() => applyProductOffer(offer)}
                                 className="cart-offer-apply-button !bg-amber-600 !border-amber-600 hover:!bg-amber-700 !text-white"
                               />
@@ -760,17 +785,19 @@ function CartPage() {
                           cart.subtotal >= (offer.min_purchase_amount || 0);
                         const isApplied =
                           cart.appliedCartOffer?.offer_id === offer.offer_id;
+                        const isApplying = applyingOfferId === offer.offer_id;
+                        const anyApplying = applyingOfferId !== null;
 
                         return (
                           <div
                             key={offer.offer_id}
-                            className={`cart-offer-row flex items-center justify-between p-3 rounded-lg transition-all ${
+                            className={`cart-offer-row flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-lg transition-all ${
                               isApplied
                                 ? "bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30"
                                 : isApplicable
                                   ? "bg-gray-50 dark:bg-[#1a262f] border border-gray-200 dark:border-[#243440]"
                                   : "bg-gray-100 dark:bg-[#1a262f]/50 opacity-60 border border-gray-200 dark:border-[#243440]"
-                            }`}
+                            } ${isApplying ? "opacity-50 pointer-events-none scale-[0.99] blur-[0.5px]" : ""}`}
                           >
                             <div className="cart-offer-copy flex items-center gap-3">
                               <i
@@ -793,7 +820,7 @@ function CartPage() {
                                 )}
                               </div>
                             </div>
-                            <div className="cart-offer-actions flex items-center gap-2">
+                            <div className="cart-offer-actions flex items-center gap-2 self-end sm:self-auto">
                               <Tag
                                 value={
                                   offer.discount_type === "percentage"
@@ -812,20 +839,23 @@ function CartPage() {
                                 !isApplied &&
                                 !cart.appliedCartOffer && (
                                   <Button
-                                    label="Apply"
+                                    label={isApplying ? "Applying..." : "Apply"}
+                                    icon={isApplying ? "pi pi-spinner pi-spin" : undefined}
                                     size="small"
+                                    disabled={anyApplying}
                                     onClick={() => {
-                                      setOfferCode(offer.offer_name);
-                                      applyOffer();
+                                      applyOffer(offer);
                                     }}
                                     className="cart-offer-apply-button !bg-[#2f7a6f] !border-[#2f7a6f] hover:!bg-[#236b62] !text-white"
                                   />
                                 )}
                               {isApplied ? (
                                 <Button
-                                  label="Remove"
+                                  label={isApplying ? "Removing..." : "Remove"}
+                                  icon={isApplying ? "pi pi-spinner pi-spin" : undefined}
                                   size="small"
-                                  onClick={removeOffer}
+                                  disabled={anyApplying}
+                                  onClick={() => removeOffer(offer.offer_id)}
                                   className="!bg-transparent !border-red-300 !text-red-600 hover:!bg-red-50 !text-xs !px-2 !py-1 dark:!border-red-500/40 dark:!text-red-400 dark:hover:!bg-red-500/10"
                                 />
                               ) : null}
@@ -863,10 +893,14 @@ function CartPage() {
                   </div>
                   <button
                     type="button"
-                    onClick={removeOffer}
-                    className="shrink-0 rounded-lg px-2 py-1 text-xs font-semibold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
+                    disabled={applyingOfferId === cart.appliedCartOffer.offer_id}
+                    onClick={() => removeOffer(cart.appliedCartOffer.offer_id)}
+                    className="shrink-0 rounded-lg px-2 py-1 text-xs font-semibold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 font-medium"
                   >
-                    Remove
+                    {applyingOfferId === cart.appliedCartOffer.offer_id && (
+                      <i className="pi pi-spinner pi-spin text-[10px]" />
+                    )}
+                    {applyingOfferId === cart.appliedCartOffer.offer_id ? "Removing..." : "Remove"}
                   </button>
                 </div>
               ) : null}

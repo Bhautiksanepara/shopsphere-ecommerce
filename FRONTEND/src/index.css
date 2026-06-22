@@ -2154,10 +2154,6 @@ html:not(.dark)
     text-align: left;
   }
 
-  .cart-item-controls {
-    flex-direction: row;
-    align-items: center;
-  }
 
   .cart-mobile-summary-bar {
     border-radius: 18px 18px 0 0;

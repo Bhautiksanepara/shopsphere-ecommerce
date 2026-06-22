@@ -280,7 +280,7 @@ export default function OrderConfirmationCODComponent() {
             {cartItems.map((item) => (
               <div
                 key={item.cartItemId}
-                className="flex items-center justify-between gap-4 rounded-2xl border border-amber-200/70 bg-amber-50/40 p-4 dark:border-[#1f2933] dark:bg-[#10171b]"
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-amber-200/70 bg-amber-50/40 p-4 dark:border-[#1f2933] dark:bg-[#10171b]"
               >
                 <div className="flex min-w-0 items-center gap-4">
                   {item.image_url ? (
@@ -309,7 +309,7 @@ export default function OrderConfirmationCODComponent() {
                     </div>
                   </div>
                 </div>
-                <div className="shrink-0 font-semibold text-gray-900 dark:text-slate-100">
+                <div className="shrink-0 font-semibold text-gray-900 dark:text-slate-100 self-end sm:self-auto">
                   {toRupee(item.discountedLineTotal ?? item.lineTotal ?? 0)}
                 </div>
               </div>

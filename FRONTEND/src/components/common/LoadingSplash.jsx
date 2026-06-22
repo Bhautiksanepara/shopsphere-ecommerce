@@ -33,8 +33,9 @@ function LoadingSplash({ onAwake }) {
     elapsedRef.current = elapsedSeconds;
   }, [elapsedSeconds]);
 
-  // Determine current phase based on time (12s per phase for 48s total)
-  const phase = elapsedSeconds < 12 ? 1 : elapsedSeconds < 24 ? 2 : elapsedSeconds < 36 ? 3 : 4;
+  // Cycle all 4 animation phases (12s each, 48s total) repeatedly while waiting
+  const phaseSeconds = elapsedSeconds % 48;
+  const phase = phaseSeconds < 12 ? 1 : phaseSeconds < 24 ? 2 : phaseSeconds < 36 ? 3 : 4;
 
   // Cycle facts every 5 seconds
   useEffect(() => {
@@ -101,8 +102,8 @@ function LoadingSplash({ onAwake }) {
       }
     } catch (error) {
       console.log("Keep-alive connection check failed: server is starting up or unreachable.");
-      // If server doesn't respond and it's been more than 55s, mark as potentially failed
-      if (elapsedRef.current > 55) {
+      // If server doesn't respond and it's been more than 90s, mark as potentially failed
+      if (elapsedRef.current > 90) {
         setStatus("failed");
       }
     }

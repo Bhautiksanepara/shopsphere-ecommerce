@@ -417,8 +417,8 @@ function LoadingSplash({ onAwake }) {
             <path d="M45,45 Q75,10 126,135" fill="none" stroke="#2563eb" strokeWidth="1.5" strokeDasharray="4 4" opacity="0.15" />
 
             {/* Flying Sparkles */}
-            <circle style={{ animation: "p2-sparkle1 3s ease-out infinite" }} cx="0" cy="0" r="3" fill="#eab308" />
-            <circle style={{ animation: "p2-sparkle2 3s ease-out infinite" }} cx="0" cy="0" r="2.5" fill="#eab308" />
+            <circle style={{ animation: "p2-sparkle1 3s ease-out infinite", transformOrigin: "0px 0px" }} cx="0" cy="0" r="3" fill="#eab308" />
+            <circle style={{ animation: "p2-sparkle2 3s ease-out infinite", transformOrigin: "0px 0px" }} cx="0" cy="0" r="2.5" fill="#eab308" />
 
             {/* Flying Item */}
             <g style={{ animation: "p2-sneaker 3s cubic-bezier(0.25, 1, 0.5, 1) infinite", transformOrigin: "0px 0px" }}>
@@ -596,7 +596,7 @@ function LoadingSplash({ onAwake }) {
 
             {/* Radar Wave rings expanding beneath pin */}
             <g transform={`translate(${activePin.x}, ${activePin.y})`}>
-              <g style={{ animation: "p3-radar-scale 3s ease-out infinite" }}>
+              <g style={{ animation: "p3-radar-scale 3s ease-out infinite", transformOrigin: "0px 3px" }}>
                 <ellipse cx="0" cy="3" rx="20" ry="7" fill="none" stroke="#ea580c" strokeWidth="2.5" />
               </g>
             </g>
@@ -790,7 +790,7 @@ function LoadingSplash({ onAwake }) {
             <g style={{ animation: "p4-seal 3s cubic-bezier(0.175, 0.885, 0.32, 1.25) infinite", transformOrigin: "0px 0px" }}>
               <circle cx="0" cy="0" r="19" fill="#10b981" filter="url(#p4-shadow)" />
               <circle cx="0" cy="0" r="15.5" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" strokeDasharray="3 2" />
-              <path d="-6,-1 L-1,4 L7,-4" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M-6,-1 L-1,4 L7,-4" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
             </g>
 
             {/* Credit Card with dynamic style parameters */}

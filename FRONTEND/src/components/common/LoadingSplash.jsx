@@ -33,9 +33,15 @@ function LoadingSplash({ onAwake }) {
     elapsedRef.current = elapsedSeconds;
   }, [elapsedSeconds]);
 
-  // Cycle all 4 animation phases (12s each, 48s total) repeatedly while waiting
-  const phaseSeconds = elapsedSeconds % 48;
-  const phase = phaseSeconds < 12 ? 1 : phaseSeconds < 24 ? 2 : phaseSeconds < 36 ? 3 : 4;
+  // Cycle all 4 animation phases (35s total: 9s × 3 + 8s) repeatedly while waiting
+  const phaseSeconds = elapsedSeconds % 35;
+  const phase = phaseSeconds < 9 ? 1 : phaseSeconds < 18 ? 2 : phaseSeconds < 27 ? 3 : 4;
+  const timeInPhase = phase === 1 ? phaseSeconds
+    : phase === 2 ? phaseSeconds - 9
+    : phase === 3 ? phaseSeconds - 18
+    : phaseSeconds - 27;
+  // Which item/variant to show — advances once per full 35s cycle, no in-phase repetition
+  const cycleIdx = Math.floor(elapsedSeconds / 35) % 4;
 
   // Cycle facts every 5 seconds
   useEffect(() => {
@@ -136,7 +142,7 @@ function LoadingSplash({ onAwake }) {
   const renderAnimation = () => {
     switch (phase) {
       case 1: {
-        const loopIdx = Math.floor(elapsedSeconds / 4) % 4;
+        const loopIdx = cycleIdx;
         
         // Determine coordinate locations of click targets for cursor transform-origin
         const clickOriginStr = 
@@ -249,7 +255,7 @@ function LoadingSplash({ onAwake }) {
             `}</style>
 
             {/* Grid Line Layout */}
-            <g className="p1-grid" style={{ animation: "p1-grid-dim 4s ease-in-out infinite" }}>
+            <g className="p1-grid" style={{ animation: "p1-grid-dim 9s ease-in-out infinite" }}>
               <line x1="120" y1="20" x2="120" y2="220" stroke="#1f3d36" strokeOpacity="0.08" strokeDasharray="4 4" />
               <line x1="20" y1="120" x2="220" y2="120" stroke="#1f3d36" strokeOpacity="0.08" strokeDasharray="4 4" />
             </g>
@@ -257,7 +263,7 @@ function LoadingSplash({ onAwake }) {
             {/* Card 1: Top-Left - Smartwatch */}
             <g transform="translate(20, 20)">
               <g style={{ 
-                animation: loopIdx === 1 ? "p1-card-selected-1 4s cubic-bezier(0.25, 1, 0.5, 1) infinite" : "p1-card1 4s ease-in-out infinite", 
+                animation: loopIdx === 1 ? "p1-card-selected-1 9s cubic-bezier(0.25, 1, 0.5, 1) infinite" : "p1-card1 9s ease-in-out infinite", 
                 transformOrigin: "40px 40px" 
               }} filter="url(#p1-shadow)">
                 <rect x="0" y="0" width="80" height="80" rx="16" fill={loopIdx === 1 ? "url(#p1-activeGrad)" : "url(#p1-cardGrad)"} stroke={loopIdx === 1 ? "#2f7a6f" : "#e8e2d5"} strokeWidth={loopIdx === 1 ? "2" : "1.5"} />
@@ -271,7 +277,7 @@ function LoadingSplash({ onAwake }) {
             {/* Card 2: Top-Right - Headphones (Hover target 1 & Click target 4) */}
             <g transform="translate(140, 20)">
               <g style={{ 
-                animation: loopIdx === 3 ? "p1-card-selected-3 4s cubic-bezier(0.25, 1, 0.5, 1) infinite" : "p1-card2 4s ease-in-out infinite", 
+                animation: loopIdx === 3 ? "p1-card-selected-3 9s cubic-bezier(0.25, 1, 0.5, 1) infinite" : "p1-card2 9s ease-in-out infinite", 
                 transformOrigin: "40px 40px" 
               }} filter="url(#p1-shadow)">
                 <rect x="0" y="0" width="80" height="80" rx="16" fill={loopIdx === 3 ? "url(#p1-activeGrad)" : "url(#p1-cardGrad)"} stroke={loopIdx === 3 ? "#2f7a6f" : "#e8e2d5"} strokeWidth={loopIdx === 3 ? "2" : "1.5"} />
@@ -284,7 +290,7 @@ function LoadingSplash({ onAwake }) {
             {/* Card 3: Bottom-Left - T-Shirt */}
             <g transform="translate(20, 140)">
               <g style={{ 
-                animation: loopIdx === 2 ? "p1-card-selected-2 4s cubic-bezier(0.25, 1, 0.5, 1) infinite" : "p1-card3 4s ease-in-out infinite", 
+                animation: loopIdx === 2 ? "p1-card-selected-2 9s cubic-bezier(0.25, 1, 0.5, 1) infinite" : "p1-card3 9s ease-in-out infinite", 
                 transformOrigin: "40px 40px" 
               }} filter="url(#p1-shadow)">
                 <rect x="0" y="0" width="80" height="80" rx="16" fill={loopIdx === 2 ? "url(#p1-activeGrad)" : "url(#p1-cardGrad)"} stroke={loopIdx === 2 ? "#2f7a6f" : "#e8e2d5"} strokeWidth={loopIdx === 2 ? "2" : "1.5"} />
@@ -295,7 +301,7 @@ function LoadingSplash({ onAwake }) {
             {/* Card 4: Bottom-Right - Sneaker (Hover & Click target) */}
             <g transform="translate(140, 140)">
               <g style={{ 
-                animation: loopIdx === 0 ? "p1-card-selected-0 4s cubic-bezier(0.25, 1, 0.5, 1) infinite" : "p1-card4-inactive 4s ease-in-out infinite", 
+                animation: loopIdx === 0 ? "p1-card-selected-0 9s cubic-bezier(0.25, 1, 0.5, 1) infinite" : "p1-card4-inactive 9s ease-in-out infinite", 
                 transformOrigin: "40px 40px" 
               }} filter="url(#p1-shadow)">
                 <rect x="0" y="0" width="80" height="80" rx="16" fill={loopIdx === 0 ? "url(#p1-activeGrad)" : "url(#p1-cardGrad)"} stroke={loopIdx === 0 ? "#2f7a6f" : "#e8e2d5"} strokeWidth={loopIdx === 0 ? "2" : "1.5"} />
@@ -310,24 +316,25 @@ function LoadingSplash({ onAwake }) {
             </g>
 
             {/* Click animation ring */}
-            <circle style={{ animation: "p1-click-ring 4s ease-out infinite", transformOrigin: clickOriginStr }} cx={clickCx} cy={clickCy} r="15" fill="none" stroke="#ef4444" strokeWidth="3.5" />
-            <circle style={{ animation: "p1-click-ring 4s ease-out infinite", transformOrigin: clickOriginStr }} cx={clickCx} cy={clickCy} r="28" fill="none" stroke="#ef4444" strokeWidth="1.5" opacity="0.5" />
+            <circle style={{ animation: "p1-click-ring 9s ease-out infinite", transformOrigin: clickOriginStr }} cx={clickCx} cy={clickCy} r="15" fill="none" stroke="#ef4444" strokeWidth="3.5" />
+            <circle style={{ animation: "p1-click-ring 9s ease-out infinite", transformOrigin: clickOriginStr }} cx={clickCx} cy={clickCy} r="28" fill="none" stroke="#ef4444" strokeWidth="1.5" opacity="0.5" />
 
             {/* Mouse Cursor */}
-            <g style={{ animation: `p1-cursor-${loopIdx} 4s cubic-bezier(0.25, 1, 0.5, 1) infinite` }}>
+            <g style={{ animation: `p1-cursor-${loopIdx} 9s cubic-bezier(0.25, 1, 0.5, 1) infinite` }}>
               <path d="M0,0 L7,20 L12,14 L20,18 Z" fill="#1f3d36" stroke="white" strokeWidth="2" strokeLinejoin="round" />
             </g>
           </svg>
         );
       }
       case 2: {
-        const loopIdx = Math.floor((elapsedSeconds - 12) / 3) % 4;
+        const item1Idx = cycleIdx;
+        const item2Idx = (cycleIdx + 1) % 4;
 
         const renderFlyingItem = (idx) => {
           switch (idx) {
             case 1: // Smartwatch
               return (
-                <g transform="translate(0, 0) scale(1.15)" fill="url(#p2-shoeGrad)">
+                <g transform="scale(1.1)" fill="url(#p2-shoeGrad)">
                   <rect x="-4" y="-18" width="8" height="36" rx="2" fill="#1f3d36" opacity="0.15" />
                   <circle cx="0" cy="0" r="11" fill="#1f3d36" />
                   <circle cx="0" cy="0" r="9" fill="none" stroke="#2f7a6f" strokeWidth="1.5" />
@@ -336,13 +343,13 @@ function LoadingSplash({ onAwake }) {
               );
             case 2: // T-Shirt
               return (
-                <g transform="translate(0, 0) scale(0.95)" fill="url(#p2-shoeGrad)">
+                <g transform="scale(0.9)" fill="url(#p2-shoeGrad)">
                   <path d="M-22,-18 L-14,-18 C-12,-14 -4,-14 -2,-18 L6,-18 L14,-10 L8,-4 L4,-7 L4,12 L-14,12 L-14,-7 L-18,-4 L-22,-10 Z" opacity="0.9" />
                 </g>
               );
             case 3: // Headphones
               return (
-                <g transform="translate(0, 0) scale(0.95)" fill="none" stroke="url(#p2-shoeGrad)" strokeWidth="3.5" strokeLinecap="round">
+                <g transform="scale(0.9)" fill="none" stroke="url(#p2-shoeGrad)" strokeWidth="3.5" strokeLinecap="round">
                   <path d="M-14,6 C-14,-10 14,-10 14,6" />
                   <rect x="-18" y="2" width="6" height="10" rx="2" fill="#2f7a6f" stroke="none" />
                   <rect x="12" y="2" width="6" height="10" rx="2" fill="#2f7a6f" stroke="none" />
@@ -351,7 +358,7 @@ function LoadingSplash({ onAwake }) {
             case 0:
             default: // Sneaker
               return (
-                <g transform="translate(0, 0) scale(0.85)" fill="url(#p2-shoeGrad)">
+                <g transform="scale(0.8)" fill="url(#p2-shoeGrad)">
                   <path d="M-18,8 C-12,9 -6,11 5,11 C12,11 18,5 20,2 L18,-1 C12,1 4,6 -10,5 Z" />
                   <path d="M-17,6 C-10,7 2,4 8,0 C12,-3 16,-8 18,-11 L6,-14 C2,-11 -4,-10 -8,-5 C-12,-2 -15,3 -17,6 Z" />
                 </g>
@@ -376,45 +383,75 @@ function LoadingSplash({ onAwake }) {
             </defs>
 
             <style>{`
-              @keyframes p2-sneaker {
-                0%        { transform: translate(45px, 45px) scale(1) rotate(0deg); opacity: 1; }
-                15%       { transform: translate(55px, 25px) scale(0.95) rotate(-15deg); opacity: 1; }
-                45%       { transform: translate(95px, 50px) scale(0.8) rotate(-45deg); opacity: 1; }
-                58%       { transform: translate(126px, 100px) scale(0.65) rotate(-72deg); opacity: 1; }
-                65%       { transform: translate(126px, 118px) scale(0.48) rotate(-83deg); opacity: 0.85; }
-                73%, 100% { transform: translate(126px, 138px) scale(0.25) rotate(-90deg); opacity: 0; }
+              /* Item 1: smooth parabolic arc from upper-left, no rotation */
+              @keyframes p2-item1 {
+                0%        { transform: translate(38px, 50px) scale(1);    opacity: 1; }
+                8%        { transform: translate(48px, 26px) scale(0.92); opacity: 1; }
+                26%       { transform: translate(90px, 54px) scale(0.7);  opacity: 1; }
+                34%       { transform: translate(126px, 108px) scale(0.44); opacity: 1; }
+                38%       { transform: translate(126px, 124px) scale(0.26); opacity: 0; }
+                39%, 100% { transform: translate(126px, 124px) scale(0);  opacity: 0; }
               }
+              /* Item 2: smooth arc from upper-right, appears after item 1 is done */
+              @keyframes p2-item2 {
+                0%, 46%   { transform: translate(202px, 50px) scale(0);   opacity: 0; }
+                47%       { transform: translate(202px, 50px) scale(1);   opacity: 1; }
+                54%       { transform: translate(192px, 26px) scale(0.92); opacity: 1; }
+                72%       { transform: translate(150px, 54px) scale(0.7); opacity: 1; }
+                80%       { transform: translate(126px, 108px) scale(0.44); opacity: 1; }
+                84%       { transform: translate(126px, 124px) scale(0.26); opacity: 0; }
+                85%, 100% { transform: translate(126px, 124px) scale(0);  opacity: 0; }
+              }
+              /* Cart: two elastic bounces, one per item landing */
               @keyframes p2-cart {
-                0%, 62%, 100% { transform: translateY(0) scale(1); }
-                68% { transform: translateY(8px) scale(1.12, 0.82); }
-                74% { transform: translateY(-16px) scale(0.88, 1.15); }
-                82% { transform: translateY(3px) scale(1.04, 0.96); }
-                90% { transform: translateY(0) scale(1); }
+                0%, 35%, 45%, 81%, 91%, 100% { transform: translateY(0) scale(1); }
+                38%  { transform: translateY(7px) scale(1.1, 0.84); }
+                41%  { transform: translateY(-10px) scale(0.91, 1.11); }
+                43%  { transform: translateY(2px) scale(1.03, 0.97); }
+                84%  { transform: translateY(7px) scale(1.1, 0.84); }
+                87%  { transform: translateY(-10px) scale(0.91, 1.11); }
+                89%  { transform: translateY(2px) scale(1.03, 0.97); }
               }
-              @keyframes p2-badge {
-                0%, 66% { transform: scale(0); opacity: 0; }
-                74% { transform: scale(1.4); opacity: 1; }
-                82% { transform: scale(0.9); opacity: 1; }
-                90%, 100% { transform: scale(1); opacity: 1; }
+              /* Badge 1: pops up showing "1", fades when badge 2 appears */
+              @keyframes p2-badge1 {
+                0%, 39%   { transform: translate(158px, 95px) scale(0); opacity: 0; }
+                43%       { transform: translate(158px, 95px) scale(1.35); opacity: 1; }
+                46%, 81%  { transform: translate(158px, 95px) scale(1); opacity: 1; }
+                85%, 100% { transform: translate(158px, 95px) scale(0); opacity: 0; }
               }
+              /* Badge 2: pops up showing "2" and stays */
+              @keyframes p2-badge2 {
+                0%, 84%   { transform: translate(158px, 95px) scale(0); opacity: 0; }
+                88%       { transform: translate(158px, 95px) scale(1.35); opacity: 1; }
+                92%, 100% { transform: translate(158px, 95px) scale(1); opacity: 1; }
+              }
+              /* Sparkle trail for item 1 */
               @keyframes p2-sparkle1 {
-                0% { transform: translate(55px, 55px) scale(0); opacity: 0; }
-                12% { transform: translate(60px, 35px) scale(1.2); opacity: 0.8; }
-                32%, 100% { transform: translate(75px, 20px) scale(0); opacity: 0; }
+                0%        { transform: translate(40px, 48px) scale(0); opacity: 0; }
+                10%       { transform: translate(58px, 24px) scale(1.1); opacity: 0.8; }
+                24%, 100% { transform: translate(78px, 14px) scale(0); opacity: 0; }
               }
+              /* Sparkle trail for item 2 */
               @keyframes p2-sparkle2 {
-                0% { transform: translate(75px, 40px) scale(0); opacity: 0; }
-                28% { transform: translate(95px, 50px) scale(1.2); opacity: 0.8; }
-                48%, 100% { transform: translate(110px, 75px) scale(0); opacity: 0; }
+                0%, 47%   { transform: translate(200px, 48px) scale(0); opacity: 0; }
+                57%       { transform: translate(180px, 24px) scale(1.1); opacity: 0.8; }
+                71%, 100% { transform: translate(158px, 14px) scale(0); opacity: 0; }
               }
-              @keyframes p2-burst {
-                0%, 64% { transform: scale(0); opacity: 0; }
-                70% { transform: scale(1.2); opacity: 1; }
-                88%, 100% { transform: scale(2); opacity: 0; }
+              /* Burst after item 1 lands */
+              @keyframes p2-burst1 {
+                0%, 35%   { transform: scale(0); opacity: 0; }
+                39%       { transform: scale(1.2); opacity: 1; }
+                50%, 100% { transform: scale(2.2); opacity: 0; }
+              }
+              /* Burst after item 2 lands */
+              @keyframes p2-burst2 {
+                0%, 81%   { transform: scale(0); opacity: 0; }
+                85%       { transform: scale(1.2); opacity: 1; }
+                96%, 100% { transform: scale(2.2); opacity: 0; }
               }
               @keyframes p2-wheel-spin {
                 from { transform: rotate(0deg); }
-                to { transform: rotate(360deg); }
+                to   { transform: rotate(360deg); }
               }
               .p2-wheel {
                 animation: p2-wheel-spin 1.2s linear infinite;
@@ -422,28 +459,31 @@ function LoadingSplash({ onAwake }) {
               }
             `}</style>
 
-            {/* Path Guide */}
-            <path d="M45,45 Q75,10 126,135" fill="none" stroke="#2563eb" strokeWidth="1.5" strokeDasharray="4 4" opacity="0.15" />
+            {/* Dashed arc guides */}
+            <path d="M38,50 Q62,6 126,124" fill="none" stroke="#2563eb" strokeWidth="1" strokeDasharray="3 5" opacity="0.12" />
+            <path d="M202,50 Q176,6 126,124" fill="none" stroke="#2563eb" strokeWidth="1" strokeDasharray="3 5" opacity="0.12" />
 
-            {/* Flying Sparkles */}
-            <circle style={{ animation: "p2-sparkle1 3s ease-out infinite", transformOrigin: "0px 0px" }} cx="0" cy="0" r="3" fill="#eab308" />
-            <circle style={{ animation: "p2-sparkle2 3s ease-out infinite", transformOrigin: "0px 0px" }} cx="0" cy="0" r="2.5" fill="#eab308" />
+            {/* Sparkle trails */}
+            <circle style={{ animation: "p2-sparkle1 9s ease-out infinite", transformOrigin: "0px 0px" }} cx="0" cy="0" r="3" fill="#eab308" />
+            <circle style={{ animation: "p2-sparkle2 9s ease-out infinite", transformOrigin: "0px 0px" }} cx="0" cy="0" r="2.5" fill="#eab308" />
 
-            {/* Flying Item */}
-            <g style={{ animation: "p2-sneaker 3s cubic-bezier(0.25, 1, 0.5, 1) infinite", transformOrigin: "0px 0px" }}>
-              <circle cx="0" cy="0" r="20" fill="#2f7a6f" opacity="0.1" />
-              {renderFlyingItem(loopIdx)}
+            {/* Flying Item 1 – from upper-left */}
+            <g style={{ animation: "p2-item1 9s cubic-bezier(0.4, 0, 0.2, 1) infinite", transformOrigin: "0px 0px" }}>
+              <circle cx="0" cy="0" r="18" fill="#2f7a6f" opacity="0.12" />
+              {renderFlyingItem(item1Idx)}
             </g>
 
-            {/* Cart Container with elastic effect (Translated to 126px for perfect bounding box centering) */}
+            {/* Flying Item 2 – from upper-right */}
+            <g style={{ animation: "p2-item2 9s cubic-bezier(0.4, 0, 0.2, 1) infinite", transformOrigin: "0px 0px" }}>
+              <circle cx="0" cy="0" r="18" fill="#2f7a6f" opacity="0.12" />
+              {renderFlyingItem(item2Idx)}
+            </g>
+
+            {/* Cart */}
             <g transform="translate(126, 140)" filter="url(#p2-shadow)">
-              <g style={{ animation: "p2-cart 3s ease-in-out infinite", transformOrigin: "0px 10px" }}>
-                {/* Symmetrical basket profile */}
+              <g style={{ animation: "p2-cart 9s ease-in-out infinite", transformOrigin: "0px 10px" }}>
                 <path d="M-48,-28 L-36,-28 L-20,10 L20,10 L36,-28 L48,-28" fill="none" stroke="url(#p2-cartGrad)" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
-                {/* Symmetrical inner grid details */}
                 <path d="M-17,-28 L-12,10 M-6,-28 L-4,10 M4,-28 L4,10 M14,-28 L12,10 M25,-28 L20,10" stroke="#60a5fa" strokeWidth="2.5" strokeLinecap="round" opacity="0.4" />
-                
-                {/* Wheels */}
                 <g transform="translate(-16, 22)">
                   <circle cx="0" cy="0" r="9" fill="none" stroke="#1f3d36" strokeWidth="3" />
                   <circle cx="0" cy="0" r="2.5" fill="#1f3d36" />
@@ -459,8 +499,8 @@ function LoadingSplash({ onAwake }) {
               </g>
             </g>
 
-            {/* Spark Bursts (Centered exactly at cart opening) */}
-            <g style={{ animation: "p2-burst 3s ease-out infinite", transformOrigin: "125px 112px" }} stroke="#3b82f6" strokeWidth="2.5" fill="none" strokeLinecap="round">
+            {/* Burst sparks – item 1 impact */}
+            <g style={{ animation: "p2-burst1 9s ease-out infinite", transformOrigin: "125px 112px" }} stroke="#3b82f6" strokeWidth="2.5" fill="none" strokeLinecap="round">
               <line x1="125" y1="105" x2="125" y2="93" />
               <line x1="140" y1="112" x2="152" y2="106" />
               <line x1="110" y1="112" x2="98" y2="106" />
@@ -468,10 +508,25 @@ function LoadingSplash({ onAwake }) {
               <line x1="115" y1="100" x2="105" y2="90" />
             </g>
 
-            {/* Item Count Red Badge */}
-            <g style={{ animation: "p2-badge 3s cubic-bezier(0.175, 0.885, 0.32, 1.275) infinite", transformOrigin: "158px 95px" }} transform="translate(158, 95)">
+            {/* Burst sparks – item 2 impact */}
+            <g style={{ animation: "p2-burst2 9s ease-out infinite", transformOrigin: "125px 112px" }} stroke="#3b82f6" strokeWidth="2.5" fill="none" strokeLinecap="round">
+              <line x1="125" y1="105" x2="125" y2="93" />
+              <line x1="140" y1="112" x2="152" y2="106" />
+              <line x1="110" y1="112" x2="98" y2="106" />
+              <line x1="135" y1="100" x2="145" y2="90" />
+              <line x1="115" y1="100" x2="105" y2="90" />
+            </g>
+
+            {/* Badge "1" – appears after item 1, disappears when item 2 lands */}
+            <g style={{ animation: "p2-badge1 9s cubic-bezier(0.175, 0.885, 0.32, 1.275) infinite", transformOrigin: "0px 0px" }}>
               <circle cx="0" cy="0" r="11" fill="#ef4444" filter="url(#p2-shadow)" />
-              <text x="0" y="3.5" fill="white" fontSize="10" fontWeight="900" textAnchor="middle" fontFamily="sans-serif">{loopIdx + 1}</text>
+              <text x="0" y="3.5" fill="white" fontSize="10" fontWeight="900" textAnchor="middle" fontFamily="sans-serif">1</text>
+            </g>
+
+            {/* Badge "2" – appears after item 2 and stays */}
+            <g style={{ animation: "p2-badge2 9s cubic-bezier(0.175, 0.885, 0.32, 1.275) infinite", transformOrigin: "0px 0px" }}>
+              <circle cx="0" cy="0" r="11" fill="#ef4444" filter="url(#p2-shadow)" />
+              <text x="0" y="3.5" fill="white" fontSize="10" fontWeight="900" textAnchor="middle" fontFamily="sans-serif">2</text>
             </g>
           </svg>
         );
@@ -483,7 +538,7 @@ function LoadingSplash({ onAwake }) {
           { x: 130, y: 90 },
           { x: 75, y: 150 }
         ];
-        const loopIdx = Math.floor((elapsedSeconds - 24) / 3) % 4;
+        const loopIdx = cycleIdx;
         const activePin = pins[loopIdx < 0 ? 0 : loopIdx];
 
         return (
@@ -594,7 +649,7 @@ function LoadingSplash({ onAwake }) {
             {/* Neon Connection Path */}
             <path 
               className="p3-path" 
-              style={{ animation: "p3-path 3s linear infinite", strokeDasharray: 160 }} 
+              style={{ animation: "p3-path 9s linear infinite", strokeDasharray: 160 }} 
               d={`M65,140 Q${(65 + activePin.x) / 2},${Math.min(140, activePin.y) - 30} ${activePin.x},${activePin.y}`}
               fill="none" 
               stroke="#ea580c" 
@@ -605,20 +660,20 @@ function LoadingSplash({ onAwake }) {
 
             {/* Radar Wave rings expanding beneath pin */}
             <g transform={`translate(${activePin.x}, ${activePin.y})`}>
-              <g style={{ animation: "p3-radar-scale 3s ease-out infinite", transformOrigin: "0px 3px" }}>
+              <g style={{ animation: "p3-radar-scale 9s ease-out infinite", transformOrigin: "0px 3px" }}>
                 <ellipse cx="0" cy="3" rx="20" ry="7" fill="none" stroke="#ea580c" strokeWidth="2.5" />
               </g>
             </g>
 
             {/* Dropped Package */}
-            <g style={{ animation: "p3-package 3s cubic-bezier(0.25, 1, 0.5, 1) infinite" }}>
+            <g style={{ animation: "p3-package 9s cubic-bezier(0.25, 1, 0.5, 1) infinite" }}>
               <rect x="-10" y="-10" width="20" height="20" rx="3" fill="#d97706" />
               <line x1="0" y1="-10" x2="0" y2="10" stroke="#fef3c7" strokeWidth="2" />
               <line x1="-10" y1="0" x2="10" y2="0" stroke="#fef3c7" strokeWidth="2" />
             </g>
 
             {/* Drone */}
-            <g style={{ animation: "p3-drone 3s ease-in-out infinite" }}>
+            <g style={{ animation: "p3-drone 9s ease-in-out infinite" }}>
               <line x1="-24" y1="-8" x2="24" y2="-8" stroke="#334155" strokeWidth="3.5" strokeLinecap="round" />
               <line x1="-16" y1="-14" x2="-16" y2="0" stroke="#475569" strokeWidth="2" />
               <line x1="16" y1="-14" x2="16" y2="0" stroke="#475569" strokeWidth="2" />
@@ -643,7 +698,7 @@ function LoadingSplash({ onAwake }) {
 
             {/* Active Pin drop */}
             <g transform={`translate(${activePin.x}, ${activePin.y})`}>
-              <g style={{ animation: "p3-pin-bounce 3s cubic-bezier(0.25, 1, 0.5, 1) infinite", transformOrigin: "0px 0px" }}>
+              <g style={{ animation: "p3-pin-bounce 9s cubic-bezier(0.25, 1, 0.5, 1) infinite", transformOrigin: "0px 0px" }}>
                 <ellipse cx="0" cy="2" rx="7" ry="2.5" fill="#1f3d36" opacity="0.25" />
                 <path d="M0,0 C-9,-9 -15,-18 -15,-28 C-15,-38 -8,-45 0,-45 C8,-45 15,-38 15,-28 C15,-18 9,-9 0,0 Z" fill="#ea580c" />
                 <circle cx="0" cy="-28" r="6" fill="#fef3c7" />
@@ -654,7 +709,7 @@ function LoadingSplash({ onAwake }) {
       }
       case 4:
       default: {
-        const cardIndex = Math.max(0, Math.floor((elapsedSeconds - 36) / 3)) % 4;
+        const cardIndex = cycleIdx;
         const cards = [
           { gradId: "p4-cardGrad-mc", name: "Mastercard" },
           { gradId: "p4-cardGrad-visa", name: "Visa" },
@@ -664,7 +719,7 @@ function LoadingSplash({ onAwake }) {
         const card = cards[cardIndex];
 
         return (
-          <svg viewBox="0 0 240 240" style={{ overflow: "visible", animation: "p4-shake 3s infinite" }} className="h-full w-full">
+          <svg viewBox="0 0 240 240" style={{ overflow: "visible", animation: "p4-shake 8s infinite" }} className="h-full w-full">
             <defs>
               <linearGradient id="p4-cardGrad-mc" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#6b1d2f" />
@@ -754,13 +809,13 @@ function LoadingSplash({ onAwake }) {
             `}</style>
 
             {/* Confetti falling particles */}
-            <rect style={{ animation: "p4-confetti-1 3s ease-out infinite" }} width="6" height="6" fill="#f59e0b" rx="1.5" />
-            <circle style={{ animation: "p4-confetti-2 3s ease-out infinite" }} r="3.5" fill="#3b82f6" />
-            <rect style={{ animation: "p4-confetti-3 3s ease-out infinite" }} width="7" height="5" fill="#10b981" rx="1" />
-            <circle style={{ animation: "p4-confetti-4 3s ease-out infinite" }} r="3" fill="#ec4899" />
+            <rect style={{ animation: "p4-confetti-1 8s ease-out infinite" }} width="6" height="6" fill="#f59e0b" rx="1.5" />
+            <circle style={{ animation: "p4-confetti-2 8s ease-out infinite" }} r="3.5" fill="#3b82f6" />
+            <rect style={{ animation: "p4-confetti-3 8s ease-out infinite" }} width="7" height="5" fill="#10b981" rx="1" />
+            <circle style={{ animation: "p4-confetti-4 8s ease-out infinite" }} r="3" fill="#ec4899" />
 
             {/* Receipt invoice ticket container */}
-            <g style={{ animation: "p4-receipt 3s cubic-bezier(0.25, 1, 0.5, 1) infinite", transformOrigin: "center top" }} filter="url(#p4-shadow)">
+            <g style={{ animation: "p4-receipt 8s cubic-bezier(0.25, 1, 0.5, 1) infinite", transformOrigin: "center top" }} filter="url(#p4-shadow)">
               <path d="M70,10 L170,10 L170,135 L162,130 L154,135 L146,130 L138,135 L130,130 L122,135 L114,130 L106,135 L98,130 L90,135 L82,130 L70,135 Z" fill="url(#p4-receiptGrad)" stroke="#e4dfd3" strokeWidth="1.5" />
               
               <line x1="66" y1="10" x2="174" y2="10" stroke="#1f3d36" strokeWidth="4.5" strokeLinecap="round" opacity="0.9" />
@@ -796,18 +851,18 @@ function LoadingSplash({ onAwake }) {
             </g>
 
             {/* Placed Order Success Seal */}
-            <g style={{ animation: "p4-seal 3s cubic-bezier(0.175, 0.885, 0.32, 1.25) infinite", transformOrigin: "0px 0px" }}>
+            <g style={{ animation: "p4-seal 8s cubic-bezier(0.175, 0.885, 0.32, 1.25) infinite", transformOrigin: "0px 0px" }}>
               <circle cx="0" cy="0" r="19" fill="#10b981" filter="url(#p4-shadow)" />
               <circle cx="0" cy="0" r="15.5" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" strokeDasharray="3 2" />
               <path d="M-6,-1 L-1,4 L7,-4" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
             </g>
 
             {/* Credit Card with dynamic style parameters */}
-            <g style={{ animation: "p4-card 3s cubic-bezier(0.25, 1, 0.5, 1) infinite", transformOrigin: "0px 0px" }} filter="url(#p4-shadow)">
+            <g style={{ animation: "p4-card 8s cubic-bezier(0.25, 1, 0.5, 1) infinite", transformOrigin: "0px 0px" }} filter="url(#p4-shadow)">
               <rect x="-56" y="-34" width="112" height="68" rx="10" fill={`url(#${card.gradId})`} stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
               
               <g opacity="0.2">
-                <rect x="-65" y="-65" width="16" height="130" fill="url(#p4-shimmer)" style={{ animation: "p4-card-shimmer 3s ease-in-out infinite", transformOrigin: "center" }} />
+                <rect x="-65" y="-65" width="16" height="130" fill="url(#p4-shimmer)" style={{ animation: "p4-card-shimmer 8s ease-in-out infinite", transformOrigin: "center" }} />
               </g>
 
               <rect x="-42" y="-18" width="15" height="12" rx="2" fill="#fbbf24" opacity="0.9" />
@@ -827,7 +882,7 @@ function LoadingSplash({ onAwake }) {
   };
 
   const progressPercent = isDemoMode
-    ? Math.min((elapsedSeconds / 48) * 100, 98)
+    ? Math.min((elapsedSeconds / 35) * 100, 98)
     : status === "loading"
       ? 97
       : status === "connecting"

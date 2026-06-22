@@ -18,7 +18,7 @@ function LoadingSplash({ onAwake }) {
   const isDemoMode = urlParams.get("demo") === "true";
 
   const [factIndex, setFactIndex] = useState(0);
-  const [status, setStatus] = useState("connecting"); // 'connecting' | 'waiting' | 'failed'
+  const [status, setStatus] = useState("connecting"); // 'connecting' | 'waiting' | 'loading' | 'failed'
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [dots, setDots] = useState("");
   const retryTimerRef = useRef(null);
@@ -91,14 +91,22 @@ function LoadingSplash({ onAwake }) {
           return;
         }
 
-        // Server is awake!
+        // Server + DB ready — stop polling
         if (retryTimerRef.current) clearInterval(retryTimerRef.current);
         if (secondsTimerRef.current) clearInterval(secondsTimerRef.current);
-        
-        // Add a slight visual delay for smooth transition
-        setTimeout(() => {
-          onAwake();
-        }, 800);
+
+        // Prefetch critical data before revealing the app so pages load instantly
+        setStatus("loading");
+        const dataTimeout = new Promise((resolve) => setTimeout(resolve, 8000));
+        await Promise.race([
+          Promise.allSettled([
+            fetch(`${apiBaseUrl}/api/category/tree`, { headers: { "Cache-Control": "no-cache" } }),
+            fetch(`${apiBaseUrl}/api/products/bestsellers?limit=8`, { headers: { "Cache-Control": "no-cache" } }),
+          ]),
+          dataTimeout,
+        ]);
+
+        setTimeout(() => onAwake(), 400);
       }
     } catch (error) {
       console.log("Keep-alive connection check failed: server is starting up or unreachable.");
@@ -820,9 +828,11 @@ function LoadingSplash({ onAwake }) {
 
   const progressPercent = isDemoMode
     ? Math.min((elapsedSeconds / 48) * 100, 98)
-    : status === "connecting"
-      ? Math.min(elapsedSeconds * 4, 45)
-      : Math.min(45 + (elapsedSeconds - 10) * 1.5, 92);
+    : status === "loading"
+      ? 97
+      : status === "connecting"
+        ? Math.min(elapsedSeconds * 4, 45)
+        : Math.min(45 + (elapsedSeconds - 10) * 1.5, 92);
 
   const activeColor = phase === 1 ? "#eab308" : phase === 2 ? "#2563eb" : phase === 3 ? "#ea580c" : "#10b981";
 
@@ -880,12 +890,15 @@ function LoadingSplash({ onAwake }) {
         <div className="mb-6 flex items-center justify-center gap-2 text-sm font-semibold text-[#1f3d36]/60">
           <span className={`inline-block h-2.5 w-2.5 rounded-full ${
             status === "connecting" ? "bg-amber-500 animate-pulse" :
-            status === "waiting" ? "bg-amber-400 animate-ping" : "bg-red-500"
+            status === "waiting"    ? "bg-amber-400 animate-ping" :
+            status === "loading"    ? "bg-emerald-500 animate-pulse" :
+            "bg-red-500"
           }`} />
           <span>
             {status === "connecting" && `Connecting to server${dots}`}
-            {status === "waiting" && `Starting server environment${dots}`}
-            {status === "failed" && "Server connection timed out"}
+            {status === "waiting"    && `Starting server environment${dots}`}
+            {status === "loading"    && `Loading store data${dots}`}
+            {status === "failed"     && "Server connection timed out"}
           </span>
         </div>
 

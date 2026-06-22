@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import pool from "./configs/db.js";
 import categoryRoutes from "./routes/category.routes.js";
 // Import Routes
 import paymentRoutes from "./routes/payments.route.js";
@@ -38,7 +39,17 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      // Allow server-to-server / curl / Postman (no origin header)
+      if (!origin) return callback(null, true);
+      // Allow static list (localhost + env vars)
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      // Allow any Vercel deployment for this project (production + preview branches)
+      if (/^https:\/\/shopsphere-ecommerce[^.]*\.vercel\.app$/.test(origin)) {
+        return callback(null, true);
+      }
+      callback(new Error(`CORS: origin '${origin}' not allowed`));
+    },
     credentials: true,
   }),
 );
@@ -84,13 +95,22 @@ app.get("/", (req, res) => {
   });
 });
 
-// Health check endpoint for monitoring / keep-alive
-app.get("/api/health", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Server is alive and healthy",
-    timestamp: new Date().toISOString(),
-  });
+// Health check endpoint — verifies both Express AND database are ready
+app.get("/api/health", async (req, res) => {
+  try {
+    const conn = await pool.getConnection();
+    conn.release();
+    res.status(200).json({
+      success: true,
+      message: "Server is alive and healthy",
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err) {
+    res.status(503).json({
+      success: false,
+      message: err.message,
+    });
+  }
 });
 
 app.use("/api/order", orderRouter);

@@ -59,7 +59,16 @@ api.interceptors.response.use(
         localStorage.removeItem("refreshToken");
         localStorage.removeItem("currentUser");
 
-        window.location.href = "/login";
+        const protectedPaths = ["/dashboard", "/orders", "/checkout", "/admin"];
+        const isProtected = protectedPaths.some((path) =>
+          window.location.pathname.startsWith(path)
+        );
+
+        if (isProtected) {
+          window.location.href = "/login";
+        } else {
+          window.location.reload();
+        }
 
         return Promise.reject(refreshError);
       }

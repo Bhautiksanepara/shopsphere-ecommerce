@@ -313,7 +313,7 @@ function ProductDetailsPage() {
         getProductImages(productId).catch(() => []),
         getProductPortions(productId).catch(() => []),
         getReviewSummary(productId).catch(() => null),
-        getVisibleProductOffers(productId).catch(() => []),
+        currentUser ? getVisibleProductOffers(productId).catch(() => []) : [],
         getCategories().catch(() => []),
         currentUser ? getCart().catch(() => null) : null,
       ]);

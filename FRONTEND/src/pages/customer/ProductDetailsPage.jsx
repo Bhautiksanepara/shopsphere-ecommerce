@@ -315,7 +315,7 @@ function ProductDetailsPage() {
         getReviewSummary(productId).catch(() => null),
         getVisibleProductOffers(productId).catch(() => []),
         getCategories().catch(() => []),
-        getCart().catch(() => null),
+        currentUser ? getCart().catch(() => null) : null,
       ]);
 
       if (!productData) {

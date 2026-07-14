@@ -143,7 +143,12 @@ function RegisterPage() {
                     feedback={false}
                     toggleMask
                     className="w-full"
-                    inputProps={{ autoComplete: "new-password" }}
+                    pt={{
+                      input: {
+                        autoComplete: "new-password",
+                        name: "password",
+                      },
+                    }}
                     inputClassName="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 shadow-none outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:shadow-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-400"
                     placeholder="Password"
                     required
@@ -154,7 +159,12 @@ function RegisterPage() {
                     feedback={false}
                     toggleMask
                     className="w-full"
-                    inputProps={{ autoComplete: "new-password" }}
+                    pt={{
+                      input: {
+                        autoComplete: "new-password",
+                        name: "confirm_password",
+                      },
+                    }}
                     inputClassName="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 shadow-none outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:shadow-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-400"
                     placeholder="Confirm Password"
                     required

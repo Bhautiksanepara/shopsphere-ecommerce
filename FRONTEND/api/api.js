@@ -5,6 +5,7 @@ const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"
 
 const api = axios.create({
   baseURL: `${apiBaseUrl}/api`,
+  timeout: 30000,
   withCredentials: true, // important for refresh cookies
 });
 //  Attach access token

@@ -124,6 +124,7 @@ function RegisterPage() {
                   <InputText
                     value={name}
                     onChange={(event) => setName(event.target.value)}
+                    autoComplete="name"
                     className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 shadow-none outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:shadow-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-400"
                     placeholder="Enter Your Name"
                     required
@@ -131,6 +132,7 @@ function RegisterPage() {
                   <InputText
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
+                    autoComplete="email"
                     className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 shadow-none outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:shadow-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-400"
                     placeholder="Email"
                     required
@@ -141,6 +143,7 @@ function RegisterPage() {
                     feedback={false}
                     toggleMask
                     className="w-full"
+                    inputProps={{ autoComplete: "new-password" }}
                     inputClassName="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 shadow-none outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:shadow-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-400"
                     placeholder="Password"
                     required
@@ -151,6 +154,7 @@ function RegisterPage() {
                     feedback={false}
                     toggleMask
                     className="w-full"
+                    inputProps={{ autoComplete: "new-password" }}
                     inputClassName="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 shadow-none outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:shadow-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-400"
                     placeholder="Confirm Password"
                     required
